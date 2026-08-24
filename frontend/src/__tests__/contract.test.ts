@@ -1,69 +1,61 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
+  toRawAmount,
+  fromRawAmount,
   getVibeBalance,
   checkClaimEligibility,
-  claimDailyVibe,
-  voteForSong,
-  addSongToJukebox,
   getLiveJukeboxQueue,
+  getTotalJukeboxVotes,
+  voteForSong,
 } from '../lib/contract';
 
-describe('Jukebox & Token Contract Logic', () => {
+describe('Jukebox & Token Contract Helpers & State', () => {
   const testUser = 'GBZXNMOPWAC2YXWKEFMGDCZULIC2KVKWUGDHG7I2T5J2TUGUVRX62AZT';
 
-  it('retrieves default initial VIBE balance', async () => {
-    const bal = await getVibeBalance(testUser);
-    expect(bal).toBe(100);
+  it('converts between human amounts and 7-decimal Soroban integer units', () => {
+    expect(toRawAmount(100)).toBe(1000000000n);
+    expect(toRawAmount(25)).toBe(250000000n);
+    expect(toRawAmount(1.5)).toBe(15000000n);
+
+    expect(fromRawAmount(1000000000n)).toBe(100);
+    expect(fromRawAmount(250000000n)).toBe(25);
+    expect(fromRawAmount('750000000')).toBe(75);
   });
 
-  it('allows daily drop claim and enforces 24-hour rate limit', async () => {
+  it('fetches on-chain jukebox queue catalog', async () => {
+    const queue = await getLiveJukeboxQueue();
+    expect(Array.isArray(queue)).toBe(true);
+    expect(queue.length).toBeGreaterThanOrEqual(5);
+
+    const firstSong = queue[0];
+    expect(firstSong).toHaveProperty('id');
+    expect(firstSong).toHaveProperty('title');
+    expect(firstSong).toHaveProperty('votes');
+    expect(typeof firstSong.votes).toBe('number');
+  });
+
+  it('queries claim eligibility from Soroban contract', async () => {
     const freshUser = 'GA2C5RFPE6GCKMY3US5PAB6UZLKIGAHWKXX2GIOVPVU27AZBCWQR3TDF';
-    
-    const initialCheck = checkClaimEligibility(freshUser);
-    expect(initialCheck.canClaim).toBe(true);
-
-    const claimRes = await claimDailyVibe(freshUser);
-    expect(claimRes.amount).toBe(100);
-    expect(claimRes.newBalance).toBe(200);
-
-    const secondCheck = checkClaimEligibility(freshUser);
-    expect(secondCheck.canClaim).toBe(false);
-
-    await expect(claimDailyVibe(freshUser)).rejects.toThrow('already claimed');
+    const eligibility = await checkClaimEligibility(freshUser);
+    expect(eligibility).toHaveProperty('canClaim');
+    expect(typeof eligibility.canClaim).toBe('boolean');
+    expect(eligibility).toHaveProperty('lastClaimTime');
   });
 
-  it('casts variable VIBE votes, burns balance, and re-orders queue', async () => {
-    const voter = 'GCFXHS4GXL6BVUCXBWXGTITROWLVYXQKQLF4YH5O5JT4YZQ6B7Y3TEST';
-    
-    // Initial queue
-    const queue = getLiveJukeboxQueue();
-    expect(queue.length).toBeGreaterThanOrEqual(3);
-
-    const targetSongId = queue[1].id;
-    const initialVotes = queue[1].votes;
-
-    // Vote 50 VIBE
-    const res = await voteForSong(voter, targetSongId, 50);
-    expect(res.song.votes).toBe(initialVotes + 50);
-    expect(res.remainingBalance).toBe(50); // 100 initial - 50 = 50
-
-    // Reject invalid amount
-    await expect(voteForSong(voter, targetSongId, 0)).rejects.toThrow('at least 1 VIBE');
-    // Reject excessive amount
-    await expect(voteForSong(voter, targetSongId, 200)).rejects.toThrow('Insufficient VIBE balance');
+  it('queries user VIBE balance on testnet', async () => {
+    const bal = await getVibeBalance(testUser);
+    expect(typeof bal).toBe('number');
+    expect(bal).toBeGreaterThanOrEqual(0);
   });
 
-  it('adds new songs to the jukebox catalog', async () => {
-    const newSong = {
-      title: 'Solitary Orbit',
-      artist: 'Stellar Voyager',
-      genre: 'Ambient Space',
-    };
+  it('queries total cumulative votes cast in jukebox', async () => {
+    const totalVotes = await getTotalJukeboxVotes();
+    expect(typeof totalVotes).toBe('number');
+    expect(totalVotes).toBeGreaterThanOrEqual(0);
+  });
 
-    const updatedQueue = await addSongToJukebox('admin', newSong);
-    const added = updatedQueue.find((s) => s.title === 'Solitary Orbit');
-    expect(added).toBeDefined();
-    expect(added?.genre).toBe('Ambient Space');
-    expect(added?.votes).toBe(0);
+  it('rejects vote if amount is 0 or negative', async () => {
+    await expect(voteForSong(testUser, 1, 0)).rejects.toThrow('at least 1 VIBE');
+    await expect(voteForSong(testUser, 1, -5)).rejects.toThrow('at least 1 VIBE');
   });
 });

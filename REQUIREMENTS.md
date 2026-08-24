@@ -126,4 +126,5 @@ Bounty: Rise In — Stellar Bootcamp. This file mirrors the official submission 
 2026-08-23 - Level 1 - Completed Freighter wallet integration, Horizon XLM balance fetch, tip payment flow with Stellar Expert links
 2026-08-23 - Level 2 - Completed StellarWalletsKit multi-wallet modal, 3+ error states, daily VIBE drop, and variable voting
 2026-08-23 - Level 3 - Completed Soroban inter-contract burn logic, Rust unit tests, Vitest frontend tests, CI/CD pipeline, and audio visualizer
+2026-08-24 - Level 2 & 3 - Deployed vibe-token & jukebox-voting to Stellar Testnet, initialized state & catalog, replaced mock logic with real Soroban RPC calls & event sync, captured on-chain verifiable tx hashes
 ```

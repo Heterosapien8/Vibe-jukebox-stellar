@@ -30,6 +30,7 @@ import {
   voteForSong,
   addSongToJukebox,
   getLiveJukeboxQueue,
+  getTotalJukeboxVotes,
 } from '@/lib/contract';
 import { soundFX } from '@/lib/sound';
 import { Disc3, Flame, Sparkles, Coins, Gift, Music, Radio, ShieldCheck, ChevronRight, CheckCircle2, Award } from 'lucide-react';
@@ -42,7 +43,7 @@ export default function HomePage() {
     walletType: null,
     network: 'TESTNET',
     xlmBalance: '0.0000',
-    vibeBalance: 100,
+    vibeBalance: 0,
     lastClaimTime: 0,
     canClaim: true,
     isLoading: false,
@@ -67,21 +68,40 @@ export default function HomePage() {
 
   // Network stats
   const [stats, setStats] = useState<JukeboxStats>({
-    totalVotes: 1410,
+    totalVotes: 0,
     totalXlmTipped: 45.0,
     activeTracks: 5,
     nextResetHours: 24,
-    dailyVotesCast: 320,
+    dailyVotesCast: 0,
   });
 
-  // Initialize catalog queue
-  useEffect(() => {
-    const liveQueue = getLiveJukeboxQueue();
-    setSongs(liveQueue);
-    if (liveQueue.length > 0 && !currentPlayingSong) {
-      setCurrentPlayingSong(liveQueue[0]);
+  // Load and poll on-chain jukebox data
+  const loadJukeboxData = useCallback(async () => {
+    try {
+      const [liveQueue, totalVotes] = await Promise.all([
+        getLiveJukeboxQueue(),
+        getTotalJukeboxVotes(),
+      ]);
+      setSongs(liveQueue);
+      setStats((prev) => ({
+        ...prev,
+        totalVotes,
+        activeTracks: liveQueue.length,
+      }));
+      if (liveQueue.length > 0) {
+        setCurrentPlayingSong((curr) => curr || liveQueue[0]);
+      }
+    } catch (e) {
+      console.error('Error loading jukebox data:', e);
     }
   }, []);
+
+  // Initialize catalog queue & start polling
+  useEffect(() => {
+    loadJukeboxData();
+    const interval = setInterval(loadJukeboxData, 5000);
+    return () => clearInterval(interval);
+  }, [loadJukeboxData]);
 
   // Sync wallet balance
   const refreshWalletBalances = useCallback(async (address: string) => {
@@ -89,7 +109,7 @@ export default function HomePage() {
       const [xlm, vibe, eligibility] = await Promise.all([
         fetchXlmBalance(address),
         getVibeBalance(address),
-        Promise.resolve(checkClaimEligibility(address)),
+        checkClaimEligibility(address),
       ]);
 
       setWalletState((prev) => ({
@@ -155,15 +175,21 @@ export default function HomePage() {
       // Auto fund with friendbot
       await requestFriendbotFunding(demo.publicKey);
 
+      const [xlm, vibe, eligibility] = await Promise.all([
+        fetchXlmBalance(demo.publicKey),
+        getVibeBalance(demo.publicKey),
+        checkClaimEligibility(demo.publicKey),
+      ]);
+
       setWalletState({
         isConnected: true,
         address: demo.publicKey,
         walletType: 'demo',
         network: 'TESTNET',
-        xlmBalance: '10000.0000',
-        vibeBalance: 100,
-        lastClaimTime: 0,
-        canClaim: true,
+        xlmBalance: xlm || '10000.0000',
+        vibeBalance: vibe,
+        lastClaimTime: eligibility.lastClaimTime,
+        canClaim: eligibility.canClaim,
         isLoading: false,
         error: null,
       });
@@ -173,7 +199,7 @@ export default function HomePage() {
         type: 'faucet',
         status: 'success',
         title: 'Demo Testnet Account Active!',
-        message: 'Funded with 10,000 XLM from Friendbot + 100 VIBE tokens.',
+        message: 'Funded with 10,000 XLM from Friendbot. Ready for on-chain Soroban claims and voting.',
         timestamp: Date.now(),
       });
     } catch (e: any) {
@@ -297,16 +323,29 @@ export default function HomePage() {
     }
   };
 
-  // Level 2 & 3: Daily Claim Flow
+  // Level 2 & 3: Daily Claim Flow (Real Soroban Transaction)
   const handleClaimDailyDrop = async () => {
     if (!walletState.address) {
       setIsWalletModalOpen(true);
       return;
     }
 
+    const claimTxId = Date.now().toString();
+    setToastFeedback({
+      id: claimTxId,
+      type: 'claim',
+      status: 'submitting',
+      title: 'Minting Daily 100 VIBE...',
+      message: 'Submitting and confirming Soroban claim transaction on Stellar Testnet.',
+      timestamp: Date.now(),
+    });
+
     try {
       setIsClaimingDrop(true);
-      const result = await claimDailyVibe(walletState.address);
+      const result = await claimDailyVibe(walletState.address, {
+        walletType: walletState.walletType,
+        demoSecretKey: demoSecretKey || undefined,
+      });
 
       setWalletState((prev) => ({
         ...prev,
@@ -316,16 +355,17 @@ export default function HomePage() {
       }));
 
       setToastFeedback({
-        id: Date.now().toString(),
+        id: claimTxId,
         type: 'claim',
         status: 'success',
-        title: '+100 VIBE Claimed!',
-        message: 'Your daily token drop has been credited for jukebox voting.',
+        title: '+100 VIBE Claimed on Soroban!',
+        message: 'Your daily token drop has been minted on-chain for jukebox voting.',
+        txHash: result.txHash,
         timestamp: Date.now(),
       });
     } catch (err: any) {
       setToastFeedback({
-        id: Date.now().toString(),
+        id: claimTxId,
         type: 'claim',
         status: 'error',
         title: 'Claim Failed',
@@ -337,15 +377,28 @@ export default function HomePage() {
     }
   };
 
-  // Level 2 & 3: Variable VIBE Vote Flow
+  // Level 2 & 3: Variable VIBE Vote Flow (Real Soroban Inter-Contract Burn)
   const handleVote = async (songId: number, amount: number) => {
     if (!walletState.address) {
       setIsWalletModalOpen(true);
       return;
     }
 
+    const voteTxId = Date.now().toString();
+    setToastFeedback({
+      id: voteTxId,
+      type: 'vote',
+      status: 'submitting',
+      title: `Voting ${amount} VIBE on Soroban...`,
+      message: 'Executing inter-contract burn transaction on Stellar Testnet.',
+      timestamp: Date.now(),
+    });
+
     try {
-      const result = await voteForSong(walletState.address, songId, amount);
+      const result = await voteForSong(walletState.address, songId, amount, {
+        walletType: walletState.walletType,
+        demoSecretKey: demoSecretKey || undefined,
+      });
 
       setSongs(result.allSongs);
       setWalletState((prev) => ({
@@ -365,40 +418,72 @@ export default function HomePage() {
       }
 
       setToastFeedback({
-        id: Date.now().toString(),
+        id: voteTxId,
         type: 'vote',
         status: 'success',
-        title: `+${amount} VIBE Votes Cast!`,
-        message: `Burned ${amount} VIBE tokens to boost "${result.song.title}".`,
+        title: `+${amount} VIBE Votes Confirmed!`,
+        message: `Burned ${amount} VIBE on-chain to boost "${result.song.title}".`,
+        txHash: result.txHash,
         timestamp: Date.now(),
       });
     } catch (err: any) {
       setToastFeedback({
-        id: Date.now().toString(),
+        id: voteTxId,
         type: 'vote',
         status: 'error',
         title: 'Vote Failed',
-        error: err?.message || 'Could not cast vote.',
+        error: err?.message || 'Could not cast vote on Soroban.',
         timestamp: Date.now(),
       });
       throw err;
     }
   };
 
-  // Add Song Handler
+  // Add Song Handler (Real Soroban Transaction)
   const handleAddSong = async (songData: any) => {
-    const updatedSongs = await addSongToJukebox(walletState.address || 'admin', songData);
-    setSongs(updatedSongs);
-    setStats((prev) => ({ ...prev, activeTracks: updatedSongs.length }));
-
+    const addTxId = Date.now().toString();
     setToastFeedback({
-      id: Date.now().toString(),
+      id: addTxId,
       type: 'add_song',
-      status: 'success',
-      title: 'Track Added to Jukebox!',
-      message: `"${songData.title}" is now live in the voting queue.`,
+      status: 'submitting',
+      title: 'Registering Track on Soroban...',
+      message: 'Recording song metadata on-chain to the Jukebox catalog.',
       timestamp: Date.now(),
     });
+
+    try {
+      const result = await addSongToJukebox(
+        walletState.address || 'GDDTSAI53ZVWY63I4RKSMLZCIUFVEDKPW4VQYWKUSKRROJZZUHZTLXHA',
+        songData,
+        {
+          walletType: walletState.walletType,
+          demoSecretKey: demoSecretKey || undefined,
+        }
+      );
+
+      setSongs(result.songs);
+      setStats((prev) => ({ ...prev, activeTracks: result.songs.length }));
+
+      setToastFeedback({
+        id: addTxId,
+        type: 'add_song',
+        status: 'success',
+        title: 'Track Added to Jukebox!',
+        message: `"${songData.title}" is now registered on-chain in the voting queue.`,
+        txHash: result.txHash,
+        timestamp: Date.now(),
+      });
+    } catch (err: any) {
+      setToastFeedback({
+        id: addTxId,
+        type: 'add_song',
+        status: 'error',
+        title: 'Add Song Failed',
+        error: err?.message || 'Could not add track to on-chain catalog.',
+        timestamp: Date.now(),
+      });
+      throw err;
+    }
   };
 
   const handlePlaySong = (song: Song) => {

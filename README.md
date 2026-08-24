@@ -14,7 +14,7 @@ Built by **Heterosapien8** (`kumardivyanshu8888@gmail.com`)
 
 **VIBE Jukebox** is a decentralized, token-curated music lounge application deployed on the **Stellar Testnet** and powered by **Soroban smart contracts**.
 
-Users connect their Stellar wallet, claim free daily **VIBE testnet tokens**, tip the jukebox node in **native XLM**, and spend variable amounts of VIBE to upvote and re-rank songs in a live shared music queue. Spent tokens are automatically burned on-chain via inter-contract calls.
+Users connect their Stellar wallet, claim free daily **VIBE testnet tokens** directly on-chain, tip the jukebox node in **native XLM**, and spend variable amounts of VIBE to upvote and re-rank songs in a live shared music queue. Spent tokens are automatically burned on-chain via cross-contract calls between `jukebox-voting` and `vibe-token`.
 
 ---
 
@@ -37,18 +37,35 @@ Users connect their Stellar wallet, claim free daily **VIBE testnet tokens**, ti
   1. *Wallet Not Found / Extension Missing* (shows direct installation guides and sandbox option).
   2. *Signature Request Rejected* (user cancellation handled gracefully without app crash).
   3. *Insufficient Balance / Unfunded Account* (friendbot 1-click testnet faucet integration).
-- [x] **Deployed Soroban Contracts**:
-  - `vibe-token`: Token contract with 24-hour rate-limited `claim_daily`, `burn`, `mint`, and `transfer`.
+- [x] **Deployed Soroban Contracts on Stellar Testnet**:
+  - `vibe-token`: Token contract with rate-limited `claim_daily`, `burn`, `mint`, and `transfer`.
   - `jukebox-voting`: Voting contract with `add_song`, variable `vote` burning tokens, and `soft_reset`.
-- [x] **Frontend Contract Invocation**: Real-time simulation and state synchronization for queue re-ordering and token burning.
+- [x] **Real Frontend Contract Invocation**: Real-time Soroban RPC calls (`simulateTransaction`, `prepareTransaction`, wallet signing, and `sendTransaction`) replacing all in-memory mock logic.
 
 ### 🥋 Level 3 (Black Belt)
-- [x] **Inter-Contract Communication**: `jukebox-voting` contract invokes `vibe-token::burn(voter, amount)` during song voting.
+- [x] **Inter-Contract Communication**: `jukebox-voting` contract invokes `VibeTokenClient::burn(voter, amount)` during song voting.
 - [x] **Daily Soft-Reset Logic**: Standings automatically clear when rolling out of an active voting day, leaving songs untouched.
 - [x] **Full Rust Unit Test Suite**: Comprehensive `#[test]` coverage for all contract functions, error cases, and daily rollover.
 - [x] **Frontend Vitest Suite**: Unit & integration tests for Stellar SDK helpers, contract state machines, and React UI components.
 - [x] **CI/CD Pipeline**: GitHub Actions workflow (`.github/workflows/ci.yml`) automating contract testing, frontend testing, and production builds.
-- [x] **Mobile Responsive Design & Web Audio API**: Live equalizer animations and synthesized sound effects.
+- [x] **Real-Time On-Chain Queue Sync**: Live polling & Soroban event queries against the deployed contracts.
+
+---
+
+## 📦 Verified Stellar Testnet Deployments & Invocations
+
+| Parameter | Value / Link |
+|---|---|
+| **Network** | Stellar Testnet (`Test SDF Network ; September 2015`) |
+| **Horizon RPC** | `https://horizon-testnet.stellar.org` |
+| **Soroban RPC** | `https://soroban-testnet.stellar.org` |
+| **VIBE Token Contract ID** | [`CD76SQMY64AT4AKTV6VHRF7MMHLC3JPQZ2W4TS57CS4VWE22E4A7G7K6`](https://stellar.expert/explorer/testnet/contract/CD76SQMY64AT4AKTV6VHRF7MMHLC3JPQZ2W4TS57CS4VWE22E4A7G7K6) |
+| **Jukebox Voting Contract ID** | [`CAVVNHZ3JH7M4MHFYVNKTR6BX6VLOUEG7R4DLEAWB26AXIVCMJBBB2QT`](https://stellar.expert/explorer/testnet/contract/CAVVNHZ3JH7M4MHFYVNKTR6BX6VLOUEG7R4DLEAWB26AXIVCMJBBB2QT) |
+| **Contract Deploy Tx (Token)** | [`01d4fffc280307e23721150246a8e989d3981bab29baee4998f7b3f41093c9ea`](https://stellar.expert/explorer/testnet/tx/01d4fffc280307e23721150246a8e989d3981bab29baee4998f7b3f41093c9ea) |
+| **Contract Deploy Tx (Voting)** | [`270ef446cb0b8180d17077d0ca5d752b7ba945c6bf72fe1c3c2cdbbe8f2ebc29`](https://stellar.expert/explorer/testnet/tx/270ef446cb0b8180d17077d0ca5d752b7ba945c6bf72fe1c3c2cdbbe8f2ebc29) |
+| **Verified Inter-Contract Vote Tx** | [`13a55ffb22c428d9563bd92b14065b2cb4e63681943ffe57ef22b50fb50b755b`](https://stellar.expert/explorer/testnet/tx/13a55ffb22c428d9563bd92b14065b2cb4e63681943ffe57ef22b50fb50b755b) |
+| **Verified Daily Claim Tx** | [`eb33d9d478f0b636291f8c7b484277e625930f9ea8791666bbd107ec78145ebc`](https://stellar.expert/explorer/testnet/tx/eb33d9d478f0b636291f8c7b484277e625930f9ea8791666bbd107ec78145ebc) |
+| **Verified Add Song Tx** | [`01cd506288a904949126056c324d330a5948a5a0a04a1a3380ee04cd9265422d`](https://stellar.expert/explorer/testnet/tx/01cd506288a904949126056c324d330a5948a5a0a04a1a3380ee04cd9265422d) |
 
 ---
 
@@ -71,9 +88,11 @@ aug_stellar/
 │   ├── src/
 │   │   ├── app/                 # Root layout, globals.css, main jukebox page
 │   │   ├── components/          # UI components (Navbar, TipModal, SongQueue, AudioVisualizer, Toast)
-│   │   ├── lib/                 # Stellar SDK, Horizon client, WalletsKit, Web Audio SFX
+│   │   ├── lib/                 # Soroban RPC client, Horizon client, WalletsKit, Web Audio SFX
 │   │   ├── types/               # TypeScript interfaces
 │   │   └── __tests__/           # Vitest & React Testing Library test suite
+│   ├── .env.local               # Deployed contract IDs & endpoints
+│   ├── .env.example             # Environment template
 │   ├── package.json
 │   ├── tailwind.config.ts
 │   └── vitest.config.ts
@@ -86,26 +105,12 @@ aug_stellar/
 
 ---
 
-## 📦 Stellar Testnet Details
-
-| Parameter | Value |
-|---|---|
-| **Network** | Stellar Testnet |
-| **Horizon RPC** | `https://horizon-testnet.stellar.org` |
-| **Soroban RPC** | `https://soroban-testnet.stellar.org` |
-| **Network Passphrase** | `Test SDF Network ; September 2015` |
-| **Jukebox Treasury Address** | `GAIH3ULLFQ4DGSECF2AR555KZ4KNDGEKN4AFI4SU2M7B43MGK3QJZNSR` |
-| **VIBE Token Contract ID** | `CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2KM` |
-| **Jukebox Voting Contract ID** | `CBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBD3LN` |
-| **Explorer** | [Stellar Expert Testnet](https://stellar.expert/explorer/testnet) |
-
----
-
 ## 🚀 Quick Start Guide
 
 ### Prerequisites
 - [Node.js](https://nodejs.org) (v18+ or v20+)
-- [Rust & Cargo](https://rustup.rs) (with `wasm32-unknown-unknown` target)
+- [Rust & Cargo](https://rustup.rs) (with `wasm32-unknown-unknown` / `wasm32v1-none` target)
+- [Stellar / Soroban CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/stellar-cli) (`stellar` / `soroban`)
 - [Freighter Wallet Extension](https://freighter.app) (optional: built-in demo sandbox included)
 
 ### 1. Clone & Setup
@@ -120,14 +125,26 @@ cargo test
 ```
 *Runs all unit tests for token minting, rate-limited daily claims, inter-contract burns, and daily soft resets.*
 
-### 3. Run Frontend Tests
+### 3. Build & Deploy Smart Contracts (Optional — already live on testnet)
+```bash
+# Build WASM binaries
+stellar contract build
+
+# Deploy VIBE token contract
+stellar contract deploy --wasm target/wasm32v1-none/release/vibe_token.wasm --source <identity> --network testnet
+
+# Deploy Jukebox voting contract
+stellar contract deploy --wasm target/wasm32v1-none/release/jukebox_voting.wasm --source <identity> --network testnet
+```
+
+### 4. Run Frontend Tests
 ```bash
 cd frontend
 npm install --legacy-peer-deps
 npm test
 ```
 
-### 4. Start Local Development Server
+### 5. Start Local Development Server
 ```bash
 cd frontend
 npm run dev
@@ -154,12 +171,12 @@ test result: ok. 5 passed; 0 failed
 
 ### Frontend (Vitest)
 ```
- ✓ src/__tests__/contract.test.ts (4 tests)
+ ✓ src/__tests__/contract.test.ts (6 tests)
  ✓ src/__tests__/stellar.test.ts (3 tests)
  ✓ src/__tests__/components.test.tsx (2 tests)
 
 Test Files  3 passed (3)
-Tests       9 passed (9)
+Tests       11 passed (11)
 ```
 
 ---

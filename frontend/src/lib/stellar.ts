@@ -4,10 +4,27 @@ export const TESTNET_HORIZON_URL = process.env.NEXT_PUBLIC_HORIZON_URL || 'https
 export const TESTNET_SOROBAN_RPC_URL = process.env.NEXT_PUBLIC_SOROBAN_RPC_URL || 'https://soroban-testnet.stellar.org';
 export const NETWORK_PASSPHRASE = Networks.TESTNET;
 
-// Contract and recipient addresses on Testnet
-export const JUKEBOX_TREASURY_ADDRESS = process.env.NEXT_PUBLIC_TREASURY_ADDRESS || 'GAIH3ULLFQ4DGSECF2AR555KZ4KNDGEKN4AFI4SU2M7B43MGK3QJZNSR';
-export const VIBE_TOKEN_CONTRACT_ID = process.env.NEXT_PUBLIC_VIBE_TOKEN_CONTRACT_ID || 'CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2KM';
-export const JUKEBOX_VOTING_CONTRACT_ID = process.env.NEXT_PUBLIC_JUKEBOX_CONTRACT_ID || 'CBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBD3LN';
+// Verified Host Node recipient address on Testnet for XLM tips
+export const JUKEBOX_HOST_NODE_ADDRESS = process.env.NEXT_PUBLIC_HOST_NODE_ADDRESS || 'GDDTSAI53ZVWY63I4RKSMLZCIUFVEDKPW4VQYWKUSKRROJZZUHZTLXHA';
+
+export const VIBE_TOKEN_CONTRACT_ID = process.env.NEXT_PUBLIC_VIBE_TOKEN_CONTRACT_ID || '';
+export const JUKEBOX_VOTING_CONTRACT_ID = process.env.NEXT_PUBLIC_JUKEBOX_CONTRACT_ID || '';
+
+export function getVibeTokenContractId(): string {
+  const id = process.env.NEXT_PUBLIC_VIBE_TOKEN_CONTRACT_ID || VIBE_TOKEN_CONTRACT_ID;
+  if (!id || id.startsWith('CAAAA')) {
+    throw new Error('NEXT_PUBLIC_VIBE_TOKEN_CONTRACT_ID environment variable is missing or invalid.');
+  }
+  return id;
+}
+
+export function getJukeboxContractId(): string {
+  const id = process.env.NEXT_PUBLIC_JUKEBOX_CONTRACT_ID || JUKEBOX_VOTING_CONTRACT_ID;
+  if (!id || id.startsWith('CBBBB')) {
+    throw new Error('NEXT_PUBLIC_JUKEBOX_CONTRACT_ID environment variable is missing or invalid.');
+  }
+  return id;
+}
 
 export const horizonServer = new Horizon.Server(TESTNET_HORIZON_URL);
 
@@ -68,7 +85,7 @@ export async function buildTipTransaction(
   })
     .addOperation(
       Operation.payment({
-        destination: JUKEBOX_TREASURY_ADDRESS,
+        destination: JUKEBOX_HOST_NODE_ADDRESS,
         asset: Asset.native(),
         amount: amountXlm,
       })

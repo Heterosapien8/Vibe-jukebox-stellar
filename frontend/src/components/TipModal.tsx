@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { soundFX } from '@/lib/sound';
-import { JUKEBOX_TREASURY_ADDRESS, getStellarExpertTxUrl } from '@/lib/stellar';
+import { JUKEBOX_HOST_NODE_ADDRESS, getStellarExpertTxUrl } from '@/lib/stellar';
 import { Coins, Heart, Loader2, ExternalLink, X, AlertCircle } from 'lucide-react';
 
 interface TipModalProps {
@@ -98,7 +98,7 @@ export const TipModal: React.FC<TipModalProps> = ({
             <span className="text-neon-emerald font-mono">Verified Node</span>
           </div>
           <p className="font-mono text-neon-cyan break-all text-[11px]">
-            {JUKEBOX_TREASURY_ADDRESS}
+            {JUKEBOX_HOST_NODE_ADDRESS}
           </p>
         </div>
 
