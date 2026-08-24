@@ -21,34 +21,25 @@ Users connect their Stellar wallet, claim free daily **VIBE testnet tokens** dir
 ## 🥋 Belt Milestones Satisfied
 
 ### 🥋 Level 1 (White Belt)
-- [x] **Freighter Wallet Integration**: Connect & disconnect handling with real-time public key discovery.
-- [x] **Live Horizon Balance Fetching**: Queries native XLM balance from Stellar Horizon Testnet (`https://horizon-testnet.stellar.org`).
-- [x] **"Tip the Jukebox" XLM Payment Flow**:
-  - Builds Stellar transaction XDR using `TransactionBuilder` and `Operation.payment`.
-  - Signs with connected wallet (Freighter / WalletsKit / Demo keypair).
-  - Submits to Stellar Horizon Testnet.
-  - Real-time transaction feedback with instant direct links to **Stellar Expert Explorer**.
-- [x] **Cyber-Neon Dark Glassmorphism UI**: High-end interactive interface with audio spectrum visualizers and sound effects.
-- [x] **10+ Granular Meaningful Git Commits**: Dedicated commit history mapping each milestone.
+### Screenshots
+
+**Wallet connected**
+![Wallet connected](./docs/ss1.png)
+
+**Balance displayed**
+![Balance displayed](./docs/ss2.png)
+
+**Successful testnet transaction**
+![Successful transaction](./docs/ss3.png)
+
+**Transaction result shown**
+![Transaction result](./docs/ss4.png)
 
 ### 🥋 Level 2 (Yellow Belt)
-- [x] **StellarWalletsKit Multi-Wallet Support**: Support for Freighter, Albedo, xBull, and LOBSTR.
-- [x] **3+ Distinct Error Types Handled**:
-  1. *Wallet Not Found / Extension Missing* (shows direct installation guides and sandbox option).
-  2. *Signature Request Rejected* (user cancellation handled gracefully without app crash).
-  3. *Insufficient Balance / Unfunded Account* (friendbot 1-click testnet faucet integration).
-- [x] **Deployed Soroban Contracts on Stellar Testnet**:
-  - `vibe-token`: Token contract with rate-limited `claim_daily`, `burn`, `mint`, and `transfer`.
-  - `jukebox-voting`: Voting contract with `add_song`, variable `vote` burning tokens, and `soft_reset`.
-- [x] **Real Frontend Contract Invocation**: Real-time Soroban RPC calls (`simulateTransaction`, `prepareTransaction`, wallet signing, and `sendTransaction`) replacing all in-memory mock logic.
 
-### 🥋 Level 3 (Black Belt)
-- [x] **Inter-Contract Communication**: `jukebox-voting` contract invokes `VibeTokenClient::burn(voter, amount)` during song voting.
-- [x] **Daily Soft-Reset Logic**: Standings automatically clear when rolling out of an active voting day, leaving songs untouched.
-- [x] **Full Rust Unit Test Suite**: Comprehensive `#[test]` coverage for all contract functions, error cases, and daily rollover.
-- [x] **Frontend Vitest Suite**: Unit & integration tests for Stellar SDK helpers, contract state machines, and React UI components.
-- [x] **CI/CD Pipeline**: GitHub Actions workflow (`.github/workflows/ci.yml`) automating contract testing, frontend testing, and production builds.
-- [x] **Real-Time On-Chain Queue Sync**: Live polling & Soroban event queries against the deployed contracts.
+
+### 🥋 Level 3 (Orange Belt)
+
 
 ---
 
