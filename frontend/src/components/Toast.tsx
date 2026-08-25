@@ -3,7 +3,12 @@
 import React from 'react';
 import { TxFeedback } from '@/types';
 import { getStellarExpertTxUrl } from '@/lib/stellar';
-import { CheckCircle2, AlertCircle, Loader2, ExternalLink, X } from 'lucide-react';
+import {
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  ArrowTopRightOnSquareIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/solid';
 
 interface ToastProps {
   feedback: TxFeedback | null;
@@ -18,64 +23,85 @@ export const Toast: React.FC<ToastProps> = ({ feedback, onClose }) => {
   const isLoading = feedback.status === 'preparing' || feedback.status === 'signing' || feedback.status === 'submitting';
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 max-w-md w-full animate-in fade-in slide-in-from-bottom-5 duration-300">
+    <div className="fixed bottom-20 right-4 sm:right-6 z-50 max-w-md w-full animate-in fade-in duration-300">
       <div
-        className={`p-4 rounded-xl border backdrop-blur-xl shadow-2xl transition-all ${
+        className={`p-4 rounded-lg border shadow-2xl transition-colors ${
           isSuccess
-            ? 'bg-emerald-950/80 border-neon-emerald text-emerald-100 shadow-neon-emerald/30'
+            ? 'bg-[#0a1816] border-neon-cyan text-cyan-100'
             : isError
-            ? 'bg-rose-950/80 border-rose-500 text-rose-100 shadow-rose-900/40'
-            : 'bg-slate-900/90 border-neon-cyan text-slate-100 shadow-neon-cyan/20'
+            ? 'bg-[#1c080d] border-led-red text-rose-100'
+            : 'bg-[#1c1208] border-neon-amber text-amber-100'
         }`}
       >
+        {/* Top Indicator Jewel Header */}
+        <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10 text-[10px] font-mono font-black uppercase tracking-widest">
+          <div className="flex items-center gap-1.5">
+            <span
+              className={`w-2.5 h-2.5 rounded-full ${
+                isSuccess
+                  ? 'bg-neon-cyan'
+                  : isError
+                  ? 'bg-led-red'
+                  : 'bg-neon-amber animate-pulse'
+              }`}
+            />
+            <span>
+              {isSuccess
+                ? 'TRANSACTION CONFIRMED'
+                : isError
+                ? 'TRANSACTION REJECTED'
+                : 'JUKEBOX OPERATING...'}
+            </span>
+          </div>
+          <button
+            onClick={onClose}
+            type="button"
+            className="text-text-secondary hover:text-white p-0.5 rounded"
+          >
+            <XMarkIcon className="w-4 h-4" />
+          </button>
+        </div>
+
         <div className="flex items-start gap-3">
           {/* Icon */}
           <div className="mt-0.5 flex-shrink-0">
-            {isLoading && <Loader2 className="w-5 h-5 text-neon-cyan animate-spin" />}
-            {isSuccess && <CheckCircle2 className="w-5 h-5 text-neon-emerald" />}
-            {isError && <AlertCircle className="w-5 h-5 text-rose-400" />}
+            {isLoading && <span className="w-5 h-5 block border-2 border-neon-amber border-t-transparent rounded-full animate-spin" />}
+            {isSuccess && <CheckCircleIcon className="w-5 h-5 text-neon-cyan" />}
+            {isError && <ExclamationCircleIcon className="w-5 h-5 text-led-red" />}
           </div>
 
           {/* Body */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between">
-              <h4 className="text-sm font-semibold tracking-wide">
-                {feedback.title}
-              </h4>
-              <button
-                onClick={onClose}
-                className="text-slate-400 hover:text-white transition-colors p-1 rounded"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
+            <h4 className="text-sm font-bold tracking-wide text-white">
+              {feedback.title}
+            </h4>
 
             {feedback.message && (
-              <p className="mt-1 text-xs text-slate-300 leading-relaxed">
+              <p className="mt-1 text-xs text-text-primary/90 leading-relaxed font-sans">
                 {feedback.message}
               </p>
             )}
 
             {/* Error Detail */}
             {isError && feedback.error && (
-              <div className="mt-2 p-2 rounded bg-rose-900/40 border border-rose-700/50 text-[11px] font-mono text-rose-200 break-words">
+              <div className="mt-2 p-2 rounded bg-[#2b080f] border border-led-red/40 text-[11px] font-mono text-rose-200 break-words">
                 {feedback.error}
               </div>
             )}
 
             {/* Stellar Expert Explorer Link */}
             {feedback.txHash && (
-              <div className="mt-2.5 flex items-center gap-1.5">
+              <div className="mt-2.5 flex items-center gap-1.5 font-mono">
                 <a
                   href={getStellarExpertTxUrl(feedback.txHash)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs font-medium text-neon-cyan hover:underline hover:text-cyan-300"
+                  className="inline-flex items-center gap-1 text-xs font-bold text-neon-cyan hover:underline"
                 >
                   <span>View on Stellar Expert</span>
-                  <ExternalLink className="w-3 h-3" />
+                  <ArrowTopRightOnSquareIcon className="w-3 h-3" />
                 </a>
-                <span className="text-[10px] text-slate-400">
+                <span className="text-[10px] text-text-secondary">
                   ({feedback.txHash.slice(0, 8)}...{feedback.txHash.slice(-6)})
                 </span>
               </div>
@@ -83,8 +109,8 @@ export const Toast: React.FC<ToastProps> = ({ feedback, onClose }) => {
 
             {/* Status step tracker during processing */}
             {isLoading && (
-              <div className="mt-2 flex items-center gap-2 text-[11px] text-slate-400">
-                <span className="inline-block w-2 h-2 rounded-full bg-neon-cyan animate-ping" />
+              <div className="mt-2 flex items-center gap-2 text-[11px] text-neon-amber font-mono">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-neon-amber animate-pulse" />
                 <span className="capitalize">Status: {feedback.status}...</span>
               </div>
             )}

@@ -3,7 +3,14 @@
 import React, { useState } from 'react';
 import { Song } from '@/types';
 import { soundFX } from '@/lib/sound';
-import { Play, Pause, Flame, Sparkles, Trophy, Music, Disc3, Radio, Plus, Loader2 } from 'lucide-react';
+import { SongQueueSkeleton } from './SkeletonLoader';
+import {
+  PlayIcon,
+  PauseIcon,
+  FireIcon,
+  MusicalNoteIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/solid';
 
 interface SongQueueProps {
   songs: Song[];
@@ -14,6 +21,7 @@ interface SongQueueProps {
   userVibeBalance: number;
   isConnected: boolean;
   onConnectPrompt: () => void;
+  isLoading?: boolean;
 }
 
 export const SongQueue: React.FC<SongQueueProps> = ({
@@ -25,9 +33,9 @@ export const SongQueue: React.FC<SongQueueProps> = ({
   userVibeBalance,
   isConnected,
   onConnectPrompt,
+  isLoading = false,
 }) => {
   const [votingSongId, setVotingSongId] = useState<number | null>(null);
-  const [customVoteAmount, setCustomVoteAmount] = useState<number>(10);
   const [isSubmittingVote, setIsSubmittingVote] = useState<boolean>(false);
 
   const highestVotes = songs.length > 0 ? Math.max(...songs.map((s) => s.votes), 1) : 1;
@@ -54,162 +62,183 @@ export const SongQueue: React.FC<SongQueueProps> = ({
     }
   };
 
+  const getSelectorCode = (index: number) => {
+    const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+    const letterIndex = Math.floor(index / 10);
+    const num = (index % 10) + 1;
+    return `${letters[letterIndex % letters.length]}-${num}`;
+  };
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-black text-white flex items-center gap-2 tracking-tight">
-            <span>Live Jukebox Standings</span>
-            <span className="w-2 h-2 rounded-full bg-neon-cyan animate-pulse" />
+    <div className="space-y-3.5">
+      {/* Queue Header Strip */}
+      <div className="flex items-center justify-between pb-2 border-b border-[#2a1333]">
+        <div className="flex items-center gap-2">
+          <MusicalNoteIcon className="w-4 h-4 text-neon-pink" />
+          <h2 className="font-mono text-sm sm:text-base font-bold text-white tracking-wider uppercase">
+            LIVE SELECTION STANDINGS
           </h2>
-          <p className="text-xs text-slate-400">
-            Top-voted track streams live. Spend variable VIBE tokens to boost your anthem up the queue.
-          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-mono font-bold text-text-secondary bg-[#1a0d24] px-2.5 py-0.5 rounded uppercase">
+            {songs.length} Tracks In Catalog
+          </span>
         </div>
       </div>
 
-      {/* Song Cards Grid */}
-      <div className="grid grid-cols-1 gap-3">
-        {songs.map((song, index) => {
-          const rank = index + 1;
-          const isTopTrack = rank === 1;
-          const isThisPlaying = currentPlayingSong?.id === song.id && isPlaying;
-          const votePercentage = Math.round((song.votes / highestVotes) * 100);
+      {/* Skeleton Loading State */}
+      {isLoading || songs.length === 0 ? (
+        <SongQueueSkeleton count={5} />
+      ) : (
+        /* Song Cards List */
+        <div className="space-y-2.5">
+          {songs.map((song, index) => {
+            const rank = index + 1;
+            const isTopTrack = rank === 1;
+            const isThisPlaying = currentPlayingSong?.id === song.id && isPlaying;
+            const votePercentage = Math.round((song.votes / highestVotes) * 100);
+            const selectorCode = getSelectorCode(index);
 
-          return (
-            <div
-              key={song.id}
-              className={`relative rounded-2xl p-4 transition-all duration-300 border ${
-                isTopTrack
-                  ? 'bg-gradient-to-r from-surface-raised via-cyan-950/20 to-surface-raised border-neon-cyan/60 shadow-neon-cyan/20'
-                  : 'bg-surface/80 border-slate-800/80 hover:border-slate-700 hover:bg-surface-raised/90'
-              }`}
-            >
-              {isTopTrack && (
-                <div className="absolute -top-3 left-6 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-neon-cyan to-neon-purple text-slate-950 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-neon-cyan">
-                  <Radio className="w-3 h-3 animate-pulse" />
-                  <span>Now Playing in Lounge</span>
-                </div>
-              )}
-
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                {/* Left: Rank, Art, Info */}
-                <div className="flex items-center gap-3.5 min-w-0">
-                  {/* Rank Badge */}
-                  <div
-                    className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-sm flex-shrink-0 ${
-                      rank === 1
-                        ? 'bg-neon-cyan/20 border border-neon-cyan text-neon-cyan shadow-neon-cyan/40'
-                        : rank === 2
-                        ? 'bg-neon-magenta/20 border border-neon-magenta text-neon-magenta'
-                        : rank === 3
-                        ? 'bg-neon-purple/20 border border-neon-purple text-neon-purple'
-                        : 'bg-slate-800/60 border border-slate-700/60 text-slate-400'
-                    }`}
-                  >
-                    {rank === 1 ? <Trophy className="w-4 h-4" /> : `#${rank}`}
+            return (
+              <div
+                key={song.id}
+                className={`relative rounded-lg p-3 sm:p-3.5 transition-colors border ${
+                  isTopTrack
+                    ? 'bg-[#1e0a24] border-neon-pink/70 shadow-[0_0_15px_rgba(255,45,109,0.25)]'
+                    : 'bg-[#120718] border-white/10 hover:border-neon-cyan/40 hover:bg-[#180b20]'
+                }`}
+              >
+                {/* Top Track Leader Ribbon */}
+                {isTopTrack && (
+                  <div className="absolute -top-2.5 left-4 px-2 py-0.5 rounded bg-[#78350f] text-[#fef3c7] text-[9px] font-mono font-black uppercase tracking-widest flex items-center gap-1 shadow-sm">
+                    <span>LEADER</span>
                   </div>
+                )}
 
-                  {/* Album Cover with Play/Pause hover */}
-                  <div className="relative w-14 h-14 rounded-xl overflow-hidden border border-slate-700 group flex-shrink-0">
-                    <img
-                      src={song.albumArt}
-                      alt={song.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                    />
-                    <button
-                      onClick={() => onPlaySong(song)}
-                      className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white"
-                      title={isThisPlaying ? 'Pause' : 'Play Preview'}
-                    >
-                      {isThisPlaying ? <Pause className="w-5 h-5 fill-white" /> : <Play className="w-5 h-5 fill-white ml-0.5" />}
-                    </button>
-                    {isThisPlaying && (
-                      <div className="absolute bottom-1 right-1 flex items-end gap-0.5 h-3">
-                        <span className="w-0.5 h-full bg-neon-cyan animate-equalizer-1 rounded" />
-                        <span className="w-0.5 h-full bg-neon-magenta animate-equalizer-2 rounded" />
-                        <span className="w-0.5 h-full bg-neon-cyan animate-equalizer-3 rounded" />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Song Metadata */}
-                  <div className="min-w-0">
-                    <h3 className="text-base font-bold text-white truncate max-w-xs sm:max-w-sm flex items-center gap-2">
-                      <span>{song.title}</span>
-                      {isTopTrack && <Sparkles className="w-4 h-4 text-neon-amber animate-pulse flex-shrink-0" />}
-                    </h3>
-                    <p className="text-xs text-slate-400 truncate">
-                      {song.artist} • <span className="text-slate-300 font-medium">{song.genre}</span>
-                    </p>
-                    <div className="mt-1.5 flex items-center gap-2 text-[11px] text-slate-400 font-mono">
-                      <span>{song.totalPlays} plays</span>
-                      <span>•</span>
-                      <span className="text-neon-cyan font-semibold">{song.duration || '2:50'}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right: Votes & Action */}
-                <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                  {/* Vote Count & Progress */}
-                  <div className="text-right min-w-[90px]">
-                    <div className="flex items-baseline justify-end gap-1">
-                      <span className="text-xl font-black text-white font-mono">{song.votes}</span>
-                      <span className="text-xs font-bold text-neon-magenta">VIBE</span>
-                    </div>
-                    {/* Visual Vote Bar */}
-                    <div className="w-24 h-1.5 bg-slate-800 rounded-full mt-1 overflow-hidden ml-auto">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  {/* Left: Selector Tag, Cover Art, Metadata */}
+                  <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto">
+                    {/* Selector Slot Code & Rank Badge (Solid Fill) */}
+                    <div className="flex flex-col items-center justify-center flex-shrink-0">
                       <div
-                        className="h-full bg-gradient-to-r from-neon-cyan to-neon-magenta rounded-full transition-all duration-500"
-                        style={{ width: `${votePercentage}%` }}
+                        className={`w-9 h-9 rounded flex flex-col items-center justify-center font-mono font-black text-xs ${
+                          rank === 1
+                            ? 'bg-[#3b1236] text-neon-pink'
+                            : rank === 2
+                            ? 'bg-[#0f2329] text-neon-cyan'
+                            : rank === 3
+                            ? 'bg-[#291705] text-neon-amber'
+                            : 'bg-[#170a1e] text-text-secondary'
+                        }`}
+                      >
+                        <span className="text-[8px] font-bold opacity-80">{selectorCode}</span>
+                        <span className="leading-none">{`#${rank}`}</span>
+                      </div>
+                    </div>
+
+                    {/* Album Cover Art */}
+                    <div className="relative w-12 h-12 rounded overflow-hidden group flex-shrink-0 bg-[#08020a]">
+                      <img
+                        src={song.albumArt}
+                        alt={song.title}
+                        className="w-full h-full object-cover"
                       />
+                      <button
+                        onClick={() => onPlaySong(song)}
+                        type="button"
+                        className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white"
+                        title={isThisPlaying ? 'Pause Audio' : 'Preview Track'}
+                      >
+                        {isThisPlaying ? (
+                          <PauseIcon className="w-5 h-5 fill-white" />
+                        ) : (
+                          <PlayIcon className="w-5 h-5 fill-white ml-0.5" />
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Track Info */}
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm sm:text-base font-bold text-white truncate font-sans">
+                        {song.title}
+                      </h3>
+                      <p className="text-xs text-text-secondary truncate">
+                        {song.artist} • <span className="text-text-primary/90 font-medium">{song.genre}</span>
+                      </p>
+                      <div className="mt-0.5 flex items-center gap-2 text-[10px] text-text-secondary font-mono">
+                        <span>{song.totalPlays} plays</span>
+                        <span>•</span>
+                        <span className="text-neon-cyan">{song.duration || '2:50'}</span>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Vote CTA Button */}
-                  <div className="relative">
-                    {votingSongId === song.id ? (
-                      <div className="flex items-center gap-1.5 p-1 rounded-xl bg-surface-raised border border-neon-magenta animate-in fade-in">
-                        {[5, 10, 25, 50].map((amt) => (
-                          <button
-                            key={amt}
-                            onClick={() => handleQuickVote(song.id, amt)}
-                            disabled={isSubmittingVote}
-                            className="px-2 py-1 rounded-lg text-xs font-bold bg-neon-magenta/20 text-neon-magenta hover:bg-neon-magenta/40 transition-colors border border-neon-magenta/30"
-                          >
-                            +{amt}
-                          </button>
-                        ))}
-                        <button
-                          onClick={() => setVotingSongId(null)}
-                          className="px-1.5 py-1 text-slate-400 hover:text-white text-xs"
-                        >
-                          ✕
-                        </button>
+                  {/* Right: Votes & Push Button Voting Action */}
+                  <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-white/5 pt-2 sm:pt-0">
+                    {/* Digital Readout Vote Counter (Solid Dark Panel) */}
+                    <div className="text-right min-w-[80px] bg-[#07020a] px-2.5 py-1.5 rounded border border-white/10">
+                      <div className="flex items-baseline justify-end gap-1 font-mono">
+                        <span className="text-base sm:text-lg font-black text-white">
+                          {song.votes}
+                        </span>
+                        <span className="text-[10px] font-bold text-neon-pink">VIBE</span>
                       </div>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          if (!isConnected) {
-                            onConnectPrompt();
-                          } else {
-                            setVotingSongId(song.id);
-                          }
-                        }}
-                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-neon-magenta/20 to-neon-purple/20 hover:from-neon-magenta/30 hover:to-neon-purple/30 border border-neon-magenta/50 text-neon-magenta text-xs font-bold shadow-neon-magenta/20 transition-all active:scale-95"
-                      >
-                        <Flame className="w-3.5 h-3.5" />
-                        <span>Boost Vote</span>
-                      </button>
-                    )}
+                      {/* Vote progress meter */}
+                      <div className="w-16 h-1 bg-[#1a0a20] rounded mt-0.5 overflow-hidden ml-auto">
+                        <div
+                          className="h-full bg-neon-pink rounded transition-all duration-300"
+                          style={{ width: `${votePercentage}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Solid Push Button Quick Vote Controls */}
+                    <div className="relative">
+                      {votingSongId === song.id ? (
+                        <div className="flex items-center gap-1 p-1 rounded bg-[#09030e] border border-neon-pink shadow-sm">
+                          {[5, 10, 25, 50].map((amt) => (
+                            <button
+                              key={amt}
+                              onClick={() => handleQuickVote(song.id, amt)}
+                              disabled={isSubmittingVote}
+                              type="button"
+                              className="px-2 py-1 rounded text-xs font-mono font-bold bg-[#ff2d6d] hover:bg-[#e0265f] text-white transition-colors"
+                            >
+                              +{amt}
+                            </button>
+                          ))}
+                          <button
+                            onClick={() => setVotingSongId(null)}
+                            type="button"
+                            className="p-1 text-text-secondary hover:text-white"
+                          >
+                            <XMarkIcon className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            if (!isConnected) {
+                              onConnectPrompt();
+                            } else {
+                              setVotingSongId(song.id);
+                            }
+                          }}
+                          type="button"
+                          className="flex items-center gap-1.5 px-3.5 py-2 rounded bg-[#ff2d6d] hover:bg-[#e0265f] text-white font-mono text-xs font-black uppercase tracking-wider transition-colors shadow-sm active:scale-95"
+                        >
+                          <FireIcon className="w-4 h-4" />
+                          <span>Push Vote</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

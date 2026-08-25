@@ -3,7 +3,13 @@
 import React, { useState } from 'react';
 import { soundFX } from '@/lib/sound';
 import { JUKEBOX_HOST_NODE_ADDRESS, getStellarExpertTxUrl } from '@/lib/stellar';
-import { Coins, Heart, Loader2, ExternalLink, X, AlertCircle } from 'lucide-react';
+import {
+  CircleStackIcon,
+  HeartIcon,
+  ArrowTopRightOnSquareIcon,
+  XMarkIcon,
+  ExclamationCircleIcon,
+} from '@heroicons/react/24/solid';
 
 interface TipModalProps {
   isOpen: boolean;
@@ -63,92 +69,92 @@ export const TipModal: React.FC<TipModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in">
-      <div className="relative max-w-lg w-full glass-panel rounded-2xl p-6 border border-neon-cyan/40 shadow-neon-cyan/30 overflow-hidden">
-        {/* Hologram scanline */}
-        <div className="scanline" />
-
-        {/* Close */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+      <div className="relative max-w-lg w-full bg-[#120718] rounded-xl p-6 border-2 border-neon-cyan/40 shadow-2xl">
+        {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+          type="button"
+          className="absolute top-4 right-4 text-text-secondary hover:text-white p-1"
         >
-          <X className="w-5 h-5" />
+          <XMarkIcon className="w-5 h-5" />
         </button>
 
         {/* Title */}
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-neon-cyan to-neon-blue flex items-center justify-center text-slate-950 font-black shadow-neon-cyan/50">
-            <Coins className="w-5 h-5" />
+          <div className="w-10 h-10 rounded bg-[#0b1e24] border border-neon-cyan flex items-center justify-center text-neon-cyan font-black">
+            <CircleStackIcon className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              Tip the Jukebox <Heart className="w-4 h-4 text-neon-magenta fill-neon-magenta" />
+            <h3 className="font-mono text-base font-black text-white flex items-center gap-2 uppercase tracking-wide">
+              <span>Tip the Jukebox Node</span>
+              <HeartIcon className="w-4 h-4 text-neon-pink" />
             </h3>
-            <p className="text-xs text-slate-400">
-              Send native testnet XLM directly on the Stellar blockchain to support the node.
+            <p className="text-xs text-text-secondary">
+              Deposit testnet XLM directly onto the Stellar blockchain to support the jukebox node.
             </p>
           </div>
         </div>
 
         {/* Destination Info */}
-        <div className="mt-4 p-3 rounded-xl bg-surface/90 border border-slate-800 text-xs text-slate-300">
-          <div className="flex justify-between items-center text-[11px] text-slate-400 mb-1">
-            <span>Treasury Destination (Stellar Testnet)</span>
-            <span className="text-neon-emerald font-mono">Verified Node</span>
+        <div className="mt-3 p-3 rounded bg-[#08030d] border border-white/10 text-xs text-text-secondary">
+          <div className="flex justify-between items-center text-[10px] font-mono mb-1">
+            <span className="text-text-secondary uppercase">Treasury Destination</span>
+            <span className="text-neon-emerald font-bold">Stellar Testnet Node</span>
           </div>
-          <p className="font-mono text-neon-cyan break-all text-[11px]">
+          <p className="font-mono text-neon-cyan break-all text-[11px] bg-[#140b1e] p-1.5 rounded">
             {JUKEBOX_HOST_NODE_ADDRESS}
           </p>
         </div>
 
         {/* Success State */}
         {txHash ? (
-          <div className="mt-5 p-4 rounded-xl bg-emerald-950/70 border border-neon-emerald text-emerald-100 animate-in fade-in">
-            <h4 className="text-sm font-bold text-neon-emerald flex items-center gap-1.5">
-              <span>Payment Confirmed on Stellar!</span>
+          <div className="mt-5 p-4 rounded bg-[#081a14] border border-neon-emerald text-emerald-100">
+            <h4 className="text-sm font-bold text-neon-emerald">
+              Payment Confirmed on Stellar!
             </h4>
             <p className="text-xs text-slate-300 mt-1">
               Thank you! Your tip of <span className="font-bold text-white">{amount} XLM</span> was successfully settled.
             </p>
-            <div className="mt-3 flex items-center gap-2">
+            <div className="mt-3 flex items-center gap-2 font-mono">
               <a
                 href={getStellarExpertTxUrl(txHash)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-900/60 hover:bg-emerald-800/80 border border-emerald-500/40 text-xs font-semibold text-neon-emerald transition-colors"
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-[#00ff9d] text-slate-950 text-xs font-bold transition-colors"
               >
                 <span>View on Stellar Expert</span>
-                <ExternalLink className="w-3 h-3" />
+                <ArrowTopRightOnSquareIcon className="w-3.5 h-3.5" />
               </a>
               <button
                 onClick={() => {
                   setTxHash(null);
                   onClose();
                 }}
-                className="text-xs text-slate-400 hover:text-white px-2 py-1.5"
+                type="button"
+                className="text-xs text-text-secondary hover:text-white px-2 py-1.5"
               >
                 Done
               </button>
             </div>
           </div>
         ) : (
-          <form onSubmit={handleTipSubmit} className="mt-5 space-y-4">
+          <form onSubmit={handleTipSubmit} className="mt-4 space-y-3.5">
             {/* Amount Presets */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-2">
-                Select XLM Amount (Your balance: {userXlmBalance} XLM)
+              <label className="block text-xs font-mono font-bold text-text-secondary mb-1.5 uppercase">
+                Select Amount (Your balance: {userXlmBalance} XLM)
               </label>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-4 gap-2 font-mono">
                 {PRESET_AMOUNTS.map((preset) => (
                   <button
                     key={preset}
                     type="button"
                     onClick={() => setAmount(preset)}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold transition-all border ${
+                    className={`py-2 px-3 rounded text-xs font-bold transition-colors ${
                       amount === preset
-                        ? 'bg-neon-cyan/20 border-neon-cyan text-neon-cyan shadow-neon-cyan/30'
-                        : 'bg-surface-raised border-slate-700/60 text-slate-300 hover:border-slate-500'
+                        ? 'bg-[#31e6e0] text-slate-950 shadow-sm'
+                        : 'bg-[#1a0c24] text-text-secondary hover:text-white'
                     }`}
                   >
                     {preset} XLM
@@ -159,7 +165,7 @@ export const TipModal: React.FC<TipModalProps> = ({
 
             {/* Custom Amount */}
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1">
+              <label className="block text-xs font-mono font-semibold text-text-secondary mb-1">
                 Custom Amount
               </label>
               <div className="relative">
@@ -170,9 +176,9 @@ export const TipModal: React.FC<TipModalProps> = ({
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="Enter XLM amount"
-                  className="w-full bg-surface-raised border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono placeholder-slate-500 focus:outline-none focus:border-neon-cyan focus:ring-1 focus:ring-neon-cyan"
+                  className="w-full bg-[#08030d] border border-white/20 rounded px-3.5 py-2 text-sm text-white font-mono placeholder-text-secondary/50 focus:outline-none focus:border-neon-cyan"
                 />
-                <span className="absolute right-3.5 top-2.5 text-xs font-bold text-slate-400 font-mono">
+                <span className="absolute right-3.5 top-2 text-xs font-bold text-text-secondary font-mono">
                   XLM
                 </span>
               </div>
@@ -180,7 +186,7 @@ export const TipModal: React.FC<TipModalProps> = ({
 
             {/* Memo */}
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1">
+              <label className="block text-xs font-mono font-semibold text-text-secondary mb-1">
                 On-chain Memo (Optional, max 28 chars)
               </label>
               <input
@@ -189,33 +195,30 @@ export const TipModal: React.FC<TipModalProps> = ({
                 value={memo}
                 onChange={(e) => setMemo(e.target.value)}
                 placeholder="Message attached to transaction"
-                className="w-full bg-surface-raised border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-neon-cyan"
+                className="w-full bg-[#08030d] border border-white/20 rounded px-3.5 py-2 text-xs text-white placeholder-text-secondary/50 focus:outline-none focus:border-neon-cyan font-mono"
               />
             </div>
 
             {/* Error banner */}
             {error && (
-              <div className="p-3 rounded-xl bg-rose-950/70 border border-rose-600/60 text-xs text-rose-200 flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />
-                <span className="break-words">{error}</span>
+              <div className="p-3 rounded bg-[#2a070f] border border-led-red/60 text-xs text-rose-200 flex items-start gap-2">
+                <ExclamationCircleIcon className="w-4 h-4 text-led-red flex-shrink-0 mt-0.5" />
+                <span className="break-words font-mono">{error}</span>
               </div>
             )}
 
-            {/* Submit Button */}
+            {/* Submit Button (Solid Cyan) */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-neon-cyan to-neon-blue text-slate-950 font-black text-sm uppercase tracking-wider shadow-neon-cyan hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full py-3 px-4 rounded bg-[#31e6e0] hover:bg-[#20c2bc] text-slate-950 font-mono font-black text-sm uppercase tracking-wider transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
-                  <span>{stepMessage || 'Signing & Submitting...'}</span>
-                </>
+                <span>{stepMessage || 'Signing & Submitting...'}</span>
               ) : (
                 <>
-                  <Coins className="w-4 h-4" />
-                  <span>Send {amount || '0'} XLM Tip</span>
+                  <CircleStackIcon className="w-4 h-4" />
+                  <span>Deposit {amount || '0'} XLM Tip</span>
                 </>
               )}
             </button>

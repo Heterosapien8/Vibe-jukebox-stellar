@@ -1,7 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { PlusCircle, Music2, Image as ImageIcon, Sparkles, X, Check } from 'lucide-react';
+import {
+  PlusCircleIcon,
+  MusicalNoteIcon,
+  XMarkIcon,
+  CheckIcon,
+} from '@heroicons/react/24/solid';
 
 interface AddSongModalProps {
   isOpen: boolean;
@@ -71,39 +76,37 @@ export const AddSongModal: React.FC<AddSongModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in">
-      <div className="relative max-w-lg w-full glass-panel rounded-2xl p-6 border border-neon-purple/40 shadow-neon-purple/30 overflow-hidden">
-        {/* Hologram scanline */}
-        <div className="scanline" />
-
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+      <div className="relative max-w-lg w-full bg-[#120718] rounded-xl p-6 border-2 border-neon-purple/50 shadow-2xl">
         {/* Close */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+          type="button"
+          className="absolute top-4 right-4 text-text-secondary hover:text-white p-1"
         >
-          <X className="w-5 h-5" />
+          <XMarkIcon className="w-5 h-5" />
         </button>
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-neon-purple to-neon-magenta flex items-center justify-center text-white font-bold shadow-neon-purple/40">
-            <PlusCircle className="w-5 h-5" />
+          <div className="w-10 h-10 rounded bg-[#200d30] border border-neon-purple flex items-center justify-center text-neon-purple font-bold">
+            <PlusCircleIcon className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              Add Track to Jukebox <Sparkles className="w-4 h-4 text-neon-cyan" />
+            <h3 className="font-mono text-base font-black text-white uppercase tracking-wide">
+              Add Track to Jukebox Catalog
             </h3>
-            <p className="text-xs text-slate-400">
-              Enqueue a new cyberpunk / synthwave anthem onto the Soroban smart contract catalog.
+            <p className="text-xs text-text-secondary">
+              Record new track metadata on-chain to the Soroban Jukebox catalog.
             </p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3.5">
           {/* Title & Artist */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-mono font-semibold text-text-secondary mb-1 uppercase">
                 Track Title *
               </label>
               <input
@@ -112,12 +115,12 @@ export const AddSongModal: React.FC<AddSongModalProps> = ({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Neon Velocity"
-                className="w-full bg-surface-raised border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-neon-cyan"
+                className="w-full bg-[#09030d] border border-white/20 rounded px-3 py-2 text-xs text-white placeholder-text-secondary/50 focus:outline-none focus:border-neon-pink font-sans"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Artist / Collective *
+              <label className="block text-xs font-mono font-semibold text-text-secondary mb-1 uppercase">
+                Artist Name *
               </label>
               <input
                 type="text"
@@ -125,20 +128,20 @@ export const AddSongModal: React.FC<AddSongModalProps> = ({
                 value={artist}
                 onChange={(e) => setArtist(e.target.value)}
                 placeholder="e.g. Stellar Pulse"
-                className="w-full bg-surface-raised border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-neon-cyan"
+                className="w-full bg-[#09030d] border border-white/20 rounded px-3 py-2 text-xs text-white placeholder-text-secondary/50 focus:outline-none focus:border-neon-pink font-sans"
               />
             </div>
           </div>
 
           {/* Genre */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-mono font-semibold text-text-secondary mb-1 uppercase">
               Genre
             </label>
             <select
               value={genre}
               onChange={(e) => setGenre(e.target.value)}
-              className="w-full bg-surface-raised border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-neon-cyan"
+              className="w-full bg-[#09030d] border border-white/20 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-neon-pink font-sans"
             >
               <option value="Synthwave">Synthwave / Outrun</option>
               <option value="Darksynth">Darksynth / Cyberpunk</option>
@@ -151,9 +154,9 @@ export const AddSongModal: React.FC<AddSongModalProps> = ({
 
           {/* Album Artwork Selection */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
-              <span>Album Cover Art</span>
-              <span className="text-[10px] text-slate-400">Select preset or paste URL</span>
+            <label className="block text-xs font-mono font-semibold text-text-secondary mb-1.5 flex items-center justify-between uppercase">
+              <span>Cover Artwork</span>
+              <span className="text-[9px] text-text-secondary font-mono">Select preset or paste URL</span>
             </label>
             <div className="grid grid-cols-4 gap-2 mb-2">
               {PRESET_ARTWORKS.map((artUrl, idx) => (
@@ -161,16 +164,16 @@ export const AddSongModal: React.FC<AddSongModalProps> = ({
                   key={idx}
                   type="button"
                   onClick={() => setAlbumArt(artUrl)}
-                  className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                  className={`relative aspect-square rounded overflow-hidden border-2 transition-all ${
                     albumArt === artUrl
-                      ? 'border-neon-cyan scale-95 shadow-neon-cyan/50'
+                      ? 'border-neon-pink shadow-md'
                       : 'border-transparent opacity-60 hover:opacity-100'
                   }`}
                 >
                   <img src={artUrl} alt="Preset Art" className="w-full h-full object-cover" />
                   {albumArt === artUrl && (
-                    <div className="absolute inset-0 bg-neon-cyan/20 flex items-center justify-center">
-                      <Check className="w-4 h-4 text-white" />
+                    <div className="absolute inset-0 bg-neon-pink/40 flex items-center justify-center">
+                      <CheckIcon className="w-4 h-4 text-white" />
                     </div>
                   )}
                 </button>
@@ -181,26 +184,26 @@ export const AddSongModal: React.FC<AddSongModalProps> = ({
               value={albumArt}
               onChange={(e) => setAlbumArt(e.target.value)}
               placeholder="Or custom Image URL"
-              className="w-full bg-surface-raised border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-300 placeholder-slate-500 focus:outline-none focus:border-neon-cyan font-mono"
+              className="w-full bg-[#09030d] border border-white/20 rounded px-3 py-1.5 text-xs text-text-secondary placeholder-text-secondary/50 focus:outline-none focus:border-neon-pink font-mono"
             />
           </div>
 
           {/* Audio Preview selection */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
-              <Music2 className="w-3.5 h-3.5 text-neon-cyan" />
-              <span>Audio Stream / Sample</span>
+            <label className="block text-xs font-mono font-semibold text-text-secondary mb-1 flex items-center gap-1.5 uppercase">
+              <MusicalNoteIcon className="w-3.5 h-3.5 text-neon-cyan" />
+              <span>Audio Sample</span>
             </label>
-            <div className="flex gap-2 mb-2">
+            <div className="flex gap-2 mb-2 font-mono">
               {PRESET_AUDIO.map((sample, idx) => (
                 <button
                   key={idx}
                   type="button"
                   onClick={() => setPreviewUrl(sample.url)}
-                  className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold border transition-all ${
+                  className={`flex-1 py-1.5 px-2 rounded text-[11px] font-bold transition-colors ${
                     previewUrl === sample.url
-                      ? 'bg-neon-purple/20 border-neon-purple text-purple-200'
-                      : 'bg-surface-raised border-slate-700 text-slate-400 hover:border-slate-500'
+                      ? 'bg-[#b83bf6] text-white'
+                      : 'bg-[#09030d] text-text-secondary hover:text-white'
                   }`}
                 >
                   {sample.label}
@@ -211,13 +214,13 @@ export const AddSongModal: React.FC<AddSongModalProps> = ({
               type="url"
               value={previewUrl}
               onChange={(e) => setPreviewUrl(e.target.value)}
-              placeholder="Or custom MP3/Audio URL"
-              className="w-full bg-surface-raised border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-300 placeholder-slate-500 focus:outline-none focus:border-neon-purple font-mono"
+              placeholder="Or custom MP3 URL"
+              className="w-full bg-[#09030d] border border-white/20 rounded px-3 py-1.5 text-xs text-text-secondary placeholder-text-secondary/50 focus:outline-none focus:border-neon-purple font-mono"
             />
           </div>
 
           {error && (
-            <div className="p-2.5 rounded-xl bg-rose-950/70 border border-rose-600/60 text-xs text-rose-200">
+            <div className="p-2.5 rounded bg-[#2a070f] border border-led-red/60 text-xs text-rose-200 font-mono">
               {error}
             </div>
           )}
@@ -225,9 +228,9 @@ export const AddSongModal: React.FC<AddSongModalProps> = ({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-neon-purple to-neon-magenta text-white font-bold text-sm uppercase tracking-wider shadow-neon-purple hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-50"
+            className="w-full py-3 px-4 rounded bg-[#b83bf6] hover:bg-[#a22ee0] text-white font-mono font-black text-xs uppercase tracking-wider transition-colors disabled:opacity-50"
           >
-            {isSubmitting ? 'Enqueuing Track...' : 'Add Track to Catalog'}
+            {isSubmitting ? 'Registering On-Chain...' : 'Register Track on Soroban'}
           </button>
         </form>
       </div>

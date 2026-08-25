@@ -2,9 +2,12 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Navbar } from '@/components/Navbar';
+import { JukeboxFrame } from '@/components/JukeboxFrame';
 import { SongQueue } from '@/components/SongQueue';
 import { AudioVisualizer } from '@/components/AudioVisualizer';
 import { StatsBanner } from '@/components/StatsBanner';
+import { MarqueeSign } from '@/components/MarqueeSign';
+import { NeonSign } from '@/components/NeonSign';
 import { TipModal } from '@/components/TipModal';
 import { DailyClaimModal } from '@/components/DailyClaimModal';
 import { AddSongModal } from '@/components/AddSongModal';
@@ -32,8 +35,6 @@ import {
   getLiveJukeboxQueue,
   getTotalJukeboxVotes,
 } from '@/lib/contract';
-import { soundFX } from '@/lib/sound';
-import { Disc3, Flame, Sparkles, Coins, Gift, Music, Radio, ShieldCheck, ChevronRight, CheckCircle2, Award } from 'lucide-react';
 
 export default function HomePage() {
   // Wallet State
@@ -51,12 +52,12 @@ export default function HomePage() {
   });
 
   const [demoSecretKey, setDemoSecretKey] = useState<string | null>(null);
-  const [isFunding, setIsFunding] = useState<boolean>(false);
 
   // Music Queue & Audio State
   const [songs, setSongs] = useState<Song[]>([]);
   const [currentPlayingSong, setCurrentPlayingSong] = useState<Song | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isLoadingSongs, setIsLoadingSongs] = useState<boolean>(true);
 
   // Modals & Feedback
   const [isWalletModalOpen, setIsWalletModalOpen] = useState<boolean>(false);
@@ -93,6 +94,8 @@ export default function HomePage() {
       }
     } catch (e) {
       console.error('Error loading jukebox data:', e);
+    } finally {
+      setIsLoadingSongs(false);
     }
   }, []);
 
@@ -198,50 +201,12 @@ export default function HomePage() {
         id: Date.now().toString(),
         type: 'faucet',
         status: 'success',
-        title: 'Demo Testnet Account Active!',
+        title: 'Demo Testnet Account Active',
         message: 'Funded with 10,000 XLM from Friendbot. Ready for on-chain Soroban claims and voting.',
         timestamp: Date.now(),
       });
     } catch (e: any) {
       setWalletState((prev) => ({ ...prev, isLoading: false, error: e?.message }));
-    }
-  };
-
-  const handleDisconnectWallet = () => {
-    setWalletState({
-      isConnected: false,
-      address: null,
-      walletType: null,
-      network: 'TESTNET',
-      xlmBalance: '0.0000',
-      vibeBalance: 100,
-      lastClaimTime: 0,
-      canClaim: true,
-      isLoading: false,
-      error: null,
-    });
-    setDemoSecretKey(null);
-  };
-
-  // Fund Account with Friendbot
-  const handleFundFriendbot = async () => {
-    if (!walletState.address) return;
-    setIsFunding(true);
-    try {
-      const success = await requestFriendbotFunding(walletState.address);
-      if (success) {
-        await refreshWalletBalances(walletState.address);
-        setToastFeedback({
-          id: Date.now().toString(),
-          type: 'faucet',
-          status: 'success',
-          title: 'Friendbot Funded 10,000 XLM!',
-          message: 'Your Stellar Testnet balance was credited.',
-          timestamp: Date.now(),
-        });
-      }
-    } finally {
-      setIsFunding(false);
     }
   };
 
@@ -262,10 +227,8 @@ export default function HomePage() {
     });
 
     try {
-      // 1. Build XDR
       const unsignedXdr = await buildTipTransaction(walletState.address, amountXlm, memo);
 
-      // 2. Sign with wallet
       setToastFeedback((prev) =>
         prev
           ? {
@@ -278,7 +241,6 @@ export default function HomePage() {
       );
       const signedXdr = await signTransactionWithWallet(unsignedXdr, walletState.walletType, demoSecretKey || undefined);
 
-      // 3. Submit to Stellar Horizon
       setToastFeedback((prev) =>
         prev
           ? {
@@ -291,7 +253,6 @@ export default function HomePage() {
       );
       const result = await submitTransactionXDR(signedXdr);
 
-      // 4. Update state & show success
       setStats((prev) => ({
         ...prev,
         totalXlmTipped: prev.totalXlmTipped + parseFloat(amountXlm),
@@ -323,7 +284,7 @@ export default function HomePage() {
     }
   };
 
-  // Level 2 & 3: Daily Claim Flow (Real Soroban Transaction)
+  // Level 2 & 3: Daily Claim Flow
   const handleClaimDailyDrop = async () => {
     if (!walletState.address) {
       setIsWalletModalOpen(true);
@@ -377,7 +338,7 @@ export default function HomePage() {
     }
   };
 
-  // Level 2 & 3: Variable VIBE Vote Flow (Real Soroban Inter-Contract Burn)
+  // Level 2 & 3: Variable VIBE Vote Flow
   const handleVote = async (songId: number, amount: number) => {
     if (!walletState.address) {
       setIsWalletModalOpen(true);
@@ -412,7 +373,6 @@ export default function HomePage() {
         dailyVotesCast: prev.dailyVotesCast + amount,
       }));
 
-      // Update current playing song if lead changed
       if (result.allSongs.length > 0 && result.allSongs[0].id !== currentPlayingSong?.id) {
         setCurrentPlayingSong(result.allSongs[0]);
       }
@@ -439,7 +399,7 @@ export default function HomePage() {
     }
   };
 
-  // Add Song Handler (Real Soroban Transaction)
+  // Add Song Handler
   const handleAddSong = async (songData: any) => {
     const addTxId = Date.now().toString();
     setToastFeedback({
@@ -495,110 +455,129 @@ export default function HomePage() {
     }
   };
 
+  const togglePlayback = () => {
+    if (!currentPlayingSong && songs.length > 0) {
+      setCurrentPlayingSong(songs[0]);
+      setIsPlaying(true);
+    } else {
+      setIsPlaying(!isPlaying);
+    }
+  };
+
   return (
-    <div className="flex-1 flex flex-col pb-28">
-      {/* Top Navigation */}
+    <div className="flex-1 flex flex-col min-h-screen pb-32">
+      {/* 1. Full-width Moving Red LED Pixel Board Ticker */}
       <Navbar
-        walletState={walletState}
-        onOpenWalletModal={() => setIsWalletModalOpen(true)}
-        onDisconnectWallet={handleDisconnectWallet}
-        onOpenTipModal={() => setIsTipModalOpen(true)}
-        onOpenDailyClaim={() => setIsDailyClaimOpen(true)}
-        onOpenAddSong={() => setIsAddSongOpen(true)}
-        onFundFriendbot={handleFundFriendbot}
-        onRefreshBalance={() => walletState.address && refreshWalletBalances(walletState.address)}
-        isFunding={isFunding}
+        topSongTitle={songs[0]?.title}
+        totalVotes={stats.totalVotes}
+        activeTracks={stats.activeTracks}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
-        {/* Cyberpunk Hero Section */}
-        <section className="relative rounded-3xl p-6 sm:p-10 overflow-hidden border border-neon-cyan/30 glass-panel shadow-neon-cyan/20 mb-8">
-          <div className="scanline" />
+      {/* 2. Main Centerstage Container with Flanking Signs (Canva Mockup Layout - Zoomed & Full Stage) */}
+      <main className="flex-1 w-full max-w-[1700px] mx-auto px-2 sm:px-4 lg:px-8 pt-2 sm:pt-4">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-3 sm:gap-6 lg:gap-8 items-center justify-between">
           
-          <div className="relative z-10 max-w-2xl">
-            {/* Belt Milestone Badges */}
-            <div className="flex flex-wrap items-center gap-2 mb-4">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-white border border-white/20">
-                <Award className="w-3.5 h-3.5 text-white" /> Level 1: White Belt
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
-                <Award className="w-3.5 h-3.5 text-yellow-300" /> Level 2: Yellow Belt
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                <Award className="w-3.5 h-3.5 text-purple-300" /> Level 3: Black Belt
-              </span>
-            </div>
+          {/* LEFT COLUMN: Top Marquee Sign ("CLICK TO TIP XLM") & Bottom Neon Sign ("CLAIM 100 VIBE") */}
+          <div className="xl:col-span-3 flex flex-row xl:flex-col items-center justify-center xl:justify-around gap-4 sm:gap-8 order-2 xl:order-1 h-full py-4">
+            {/* Top-Left: Vintage Vegas/Diner Marquee Sign */}
+            <MarqueeSign
+              subText="CLICK TO"
+              actionText="TIP XLM"
+              onClick={() => setIsTipModalOpen(true)}
+              title="Deposit XLM tip to support jukebox node"
+            />
 
-            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-none mb-3">
-              THE TOKEN-CURATED <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-magenta neon-text-cyan">
-                DECENTRALIZED JUKEBOX
-              </span>
-            </h1>
-
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-6">
-              Claim daily <span className="text-neon-cyan font-bold">100 VIBE tokens</span>, tip the node in <span className="text-neon-magenta font-bold">Stellar XLM</span>, and spend variable VIBE to upvote and re-rank tracks in real time on Soroban smart contracts.
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                onClick={() => setIsDailyClaimOpen(true)}
-                className="px-5 py-3 rounded-xl bg-gradient-to-r from-neon-magenta to-neon-purple hover:from-pink-600 hover:to-purple-600 text-white font-black text-xs uppercase tracking-wider shadow-neon-magenta transition-all active:scale-95 flex items-center gap-2"
-              >
-                <Gift className="w-4 h-4" />
-                <span>Claim Free 100 VIBE</span>
-              </button>
-
-              <button
-                onClick={() => setIsTipModalOpen(true)}
-                className="px-5 py-3 rounded-xl bg-surface-card hover:bg-surface-raised border border-neon-cyan/50 text-neon-cyan font-bold text-xs uppercase tracking-wider transition-all active:scale-95 flex items-center gap-2"
-              >
-                <Coins className="w-4 h-4" />
-                <span>Tip with XLM</span>
-              </button>
-            </div>
+            {/* Bottom-Left: Hot Pink Neon Tube Sign */}
+            <NeonSign
+              line1="CLAIM"
+              line2="100 VIBE"
+              subBadge={walletState.canClaim ? 'READY NOW' : 'DAILY DROP'}
+              onClick={() => setIsDailyClaimOpen(true)}
+              title="Claim daily 100 VIBE testnet tokens"
+            />
           </div>
 
-          {/* Holographic Glowing Vinyl Accent */}
-          <div className="hidden lg:block absolute -right-8 -bottom-8 w-80 h-80 opacity-60 pointer-events-none">
-            <div className="w-full h-full rounded-full border-[12px] border-neon-cyan/20 animate-spin" style={{ animationDuration: '20s' }}>
-              <div className="w-full h-full rounded-full border-[20px] border-neon-magenta/20 p-8">
-                <div className="w-full h-full rounded-full bg-gradient-to-tr from-neon-cyan/30 to-neon-purple/30 backdrop-blur-xl flex items-center justify-center">
-                  <Disc3 className="w-16 h-16 text-neon-cyan/80" />
-                </div>
-              </div>
-            </div>
+          {/* CENTER COLUMN: The Authentic Jukebox Centerpiece */}
+          <div className="xl:col-span-6 order-1 xl:order-2 w-full max-w-4xl mx-auto">
+            <JukeboxFrame
+              currentPlayingSong={currentPlayingSong}
+              topSong={songs[0] || null}
+              isPlaying={isPlaying}
+              onTogglePlay={togglePlayback}
+              stats={stats}
+              userVibeBalance={walletState.vibeBalance}
+              canClaim={walletState.canClaim}
+            >
+              {/* Song Queue Standings */}
+              <SongQueue
+                songs={songs}
+                currentPlayingSong={currentPlayingSong}
+                isPlaying={isPlaying}
+                onPlaySong={handlePlaySong}
+                onVote={handleVote}
+                userVibeBalance={walletState.vibeBalance}
+                isConnected={walletState.isConnected}
+                onConnectPrompt={() => setIsWalletModalOpen(true)}
+                isLoading={isLoadingSongs}
+              />
+            </JukeboxFrame>
           </div>
-        </section>
 
-        {/* Real-time Network Metrics */}
-        <StatsBanner
-          stats={stats}
-          topSongTitle={songs[0]?.title}
-          topSongVotes={songs[0]?.votes}
-        />
+          {/* RIGHT COLUMN: Top Marquee Sign ("CLICK TO ADD TRACK") & Bottom Neon Sign ("CONNECT WALLET") */}
+          <div className="xl:col-span-3 flex flex-row xl:flex-col items-center justify-center xl:justify-around gap-4 sm:gap-8 order-3 h-full py-4">
+            {/* Top-Right: Vintage Vegas/Diner Marquee Sign */}
+            <MarqueeSign
+              subText="CLICK TO"
+              actionText="ADD TRACK"
+              onClick={() => setIsAddSongOpen(true)}
+              title="Add new music track to on-chain catalog"
+            />
 
-        {/* Standings Queue */}
-        <div className="mt-8">
-          <SongQueue
-            songs={songs}
-            currentPlayingSong={currentPlayingSong}
-            isPlaying={isPlaying}
-            onPlaySong={handlePlaySong}
-            onVote={handleVote}
-            userVibeBalance={walletState.vibeBalance}
-            isConnected={walletState.isConnected}
-            onConnectPrompt={() => setIsWalletModalOpen(true)}
+            {/* Bottom-Right: Hot Pink Neon Tube Sign */}
+            <NeonSign
+              line1={walletState.isConnected ? 'WALLET' : 'CONNECT'}
+              line2={walletState.isConnected ? 'ACTIVE' : 'WALLET'}
+              subBadge={
+                walletState.isConnected && walletState.address
+                  ? `${walletState.address.slice(0, 4)}...${walletState.address.slice(-4)}`
+                  : 'STELLAR TESTNET'
+              }
+              onClick={() => setIsWalletModalOpen(true)}
+              title={walletState.isConnected ? 'View Wallet Connection' : 'Connect Stellar Wallet'}
+            />
+          </div>
+
+        </div>
+
+        {/* Real-time Network Metrics Solid Flashcards */}
+        <div className="w-full max-w-6xl mx-auto mt-6 sm:mt-8">
+          <StatsBanner
+            stats={stats}
+            topSongTitle={songs[0]?.title}
+            topSongVotes={songs[0]?.votes}
           />
         </div>
       </main>
 
-      {/* Floating Audio Player & Equalizer Bar */}
+      {/* Retro Diner Checkerboard Floor Strip Divider / Footer */}
+      <footer className="mt-12 w-full">
+        <div className="w-full h-8 checkerboard-strip border-t border-b border-neon-pink/20 opacity-30" />
+        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between text-xs text-text-secondary font-mono gap-2">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-neon-emerald" />
+            <span>STELLAR TESTNET • SOROBAN SMART CONTRACTS</span>
+          </div>
+          <div>
+            <span>VIBE JUKEBOX — VINTAGE EDITION</span>
+          </div>
+        </div>
+      </footer>
+
+      {/* Floating Audio Player & Equalizer Console */}
       <AudioVisualizer
         currentSong={currentPlayingSong}
         isPlaying={isPlaying}
-        onTogglePlay={() => setIsPlaying(!isPlaying)}
+        onTogglePlay={togglePlayback}
       />
 
       {/* Modals & Feedback */}
@@ -633,7 +612,7 @@ export default function HomePage() {
         onAddSong={handleAddSong}
       />
 
-      {/* Toast Notification */}
+      {/* Toast Mechanism Indicator Notification */}
       <Toast
         feedback={toastFeedback}
         onClose={() => setToastFeedback(null)}

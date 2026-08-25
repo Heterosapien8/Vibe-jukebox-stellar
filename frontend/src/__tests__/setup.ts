@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 
 process.env.NEXT_PUBLIC_VIBE_TOKEN_CONTRACT_ID =
   process.env.NEXT_PUBLIC_VIBE_TOKEN_CONTRACT_ID || 'CD76SQMY64AT4AKTV6VHRF7MMHLC3JPQZ2W4TS57CS4VWE22E4A7G7K6';

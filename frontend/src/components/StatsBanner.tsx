@@ -1,8 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Flame, Coins, Music, Clock, Zap } from 'lucide-react';
 import { JukeboxStats } from '@/types';
+import {
+  FireIcon,
+  CircleStackIcon,
+  MusicalNoteIcon,
+  ClockIcon,
+} from '@heroicons/react/24/solid';
 
 interface StatsBannerProps {
   stats: JukeboxStats;
@@ -36,66 +41,88 @@ export const StatsBanner: React.FC<StatsBannerProps> = ({
   }, []);
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 my-6">
-      {/* Stat 1: Total Votes Cast */}
-      <div className="p-4 rounded-2xl bg-surface/70 border border-slate-800/80 backdrop-blur-xl hover:border-neon-cyan/40 transition-all group">
-        <div className="flex items-center justify-between text-slate-400 mb-2">
-          <span className="text-xs font-semibold uppercase tracking-wider">Total Votes</span>
-          <Flame className="w-4 h-4 text-neon-cyan group-hover:scale-110 transition-transform" />
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 my-6">
+      {/* Flashcard 1: TOTAL VOTES - Solid Hot Pink Card */}
+      <div className="p-4 sm:p-5 rounded-xl bg-[#be123c] text-white shadow-lg flex flex-col justify-between select-none">
+        <div className="flex items-center justify-between mb-2">
+          <span className="font-display text-xs sm:text-sm font-bold uppercase tracking-wider text-white">
+            TOTAL VOTES
+          </span>
+          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+            <FireIcon className="w-4 h-4 text-white" />
+          </div>
         </div>
-        <div className="flex items-baseline gap-1.5">
-          <span className="text-2xl font-black text-white font-mono tracking-tight">
+        <div className="my-1 flex items-baseline gap-2">
+          <span className="font-display text-2xl sm:text-3xl lg:text-4xl font-black text-white">
             {stats.totalVotes.toLocaleString()}
           </span>
-          <span className="text-xs font-bold text-neon-cyan">VIBE</span>
+          <span className="font-display text-sm font-bold text-white/90">VIBE</span>
         </div>
-        <span className="text-[10px] text-slate-400 mt-1 block">Burned on Soroban Contract</span>
+        <span className="font-display text-xs text-white/80 mt-1 block truncate">
+          Burned on Soroban
+        </span>
       </div>
 
-      {/* Stat 2: Total XLM Tipped */}
-      <div className="p-4 rounded-2xl bg-surface/70 border border-slate-800/80 backdrop-blur-xl hover:border-neon-magenta/40 transition-all group">
-        <div className="flex items-center justify-between text-slate-400 mb-2">
-          <span className="text-xs font-semibold uppercase tracking-wider">Tips to Node</span>
-          <Coins className="w-4 h-4 text-neon-magenta group-hover:scale-110 transition-transform" />
+      {/* Flashcard 2: NODE TIPS - Solid Teal/Cyan Card */}
+      <div className="p-4 sm:p-5 rounded-xl bg-[#0e7490] text-white shadow-lg flex flex-col justify-between select-none">
+        <div className="flex items-center justify-between mb-2">
+          <span className="font-display text-xs sm:text-sm font-bold uppercase tracking-wider text-white">
+            NODE TIPS
+          </span>
+          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+            <CircleStackIcon className="w-4 h-4 text-white" />
+          </div>
         </div>
-        <div className="flex items-baseline gap-1.5">
-          <span className="text-2xl font-black text-white font-mono tracking-tight">
+        <div className="my-1 flex items-baseline gap-2">
+          <span className="font-display text-2xl sm:text-3xl lg:text-4xl font-black text-white">
             {stats.totalXlmTipped.toFixed(1)}
           </span>
-          <span className="text-xs font-bold text-neon-magenta">XLM</span>
+          <span className="font-display text-sm font-bold text-white/90">XLM</span>
         </div>
-        <span className="text-[10px] text-slate-400 mt-1 block">Settled on Stellar Horizon</span>
+        <span className="font-display text-xs text-white/80 mt-1 block truncate">
+          Horizon Settlement
+        </span>
       </div>
 
-      {/* Stat 3: Active Catalog Queue */}
-      <div className="p-4 rounded-2xl bg-surface/70 border border-slate-800/80 backdrop-blur-xl hover:border-neon-purple/40 transition-all group">
-        <div className="flex items-center justify-between text-slate-400 mb-2">
-          <span className="text-xs font-semibold uppercase tracking-wider">Queue Tracks</span>
-          <Music className="w-4 h-4 text-neon-purple group-hover:scale-110 transition-transform" />
+      {/* Flashcard 3: QUEUE TRACKS - Solid Royal Purple Card */}
+      <div className="p-4 sm:p-5 rounded-xl bg-[#6d28d9] text-white shadow-lg flex flex-col justify-between select-none">
+        <div className="flex items-center justify-between mb-2">
+          <span className="font-display text-xs sm:text-sm font-bold uppercase tracking-wider text-white">
+            QUEUE TRACKS
+          </span>
+          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+            <MusicalNoteIcon className="w-4 h-4 text-white" />
+          </div>
         </div>
-        <div className="flex items-baseline gap-1.5">
-          <span className="text-2xl font-black text-white font-mono tracking-tight">
+        <div className="my-1 flex items-baseline gap-2">
+          <span className="font-display text-2xl sm:text-3xl lg:text-4xl font-black text-white">
             {stats.activeTracks}
           </span>
-          <span className="text-xs font-medium text-slate-400">Songs</span>
+          <span className="font-display text-sm font-bold text-white/90">Songs</span>
         </div>
-        <span className="text-[10px] text-neon-purple font-medium mt-1 block truncate">
+        <span className="font-display text-xs text-white/80 mt-1 block truncate">
           Lead: {topSongTitle || 'Neon Odyssey'} ({topSongVotes || 0} v)
         </span>
       </div>
 
-      {/* Stat 4: Soft-Reset Rollover Clock */}
-      <div className="p-4 rounded-2xl bg-surface/70 border border-slate-800/80 backdrop-blur-xl hover:border-neon-amber/40 transition-all group">
-        <div className="flex items-center justify-between text-slate-400 mb-2">
-          <span className="text-xs font-semibold uppercase tracking-wider">Daily Soft Reset</span>
-          <Clock className="w-4 h-4 text-neon-amber group-hover:scale-110 transition-transform" />
+      {/* Flashcard 4: DAILY RESET - Solid Golden Amber Card */}
+      <div className="p-4 sm:p-5 rounded-xl bg-[#b45309] text-white shadow-lg flex flex-col justify-between select-none">
+        <div className="flex items-center justify-between mb-2">
+          <span className="font-display text-xs sm:text-sm font-bold uppercase tracking-wider text-white">
+            DAILY RESET
+          </span>
+          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+            <ClockIcon className="w-4 h-4 text-white" />
+          </div>
         </div>
-        <div className="flex items-baseline gap-1.5">
-          <span className="text-xl font-black text-neon-amber font-mono tracking-tight">
+        <div className="my-1 flex items-baseline gap-2">
+          <span className="font-display text-xl sm:text-2xl lg:text-3xl font-black text-white">
             {resetCountdown || '23h 59m'}
           </span>
         </div>
-        <span className="text-[10px] text-slate-400 mt-1 block">Clears standings if active</span>
+        <span className="font-display text-xs text-white/80 mt-1 block truncate">
+          Standings rollover
+        </span>
       </div>
     </div>
   );
