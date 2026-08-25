@@ -22,6 +22,9 @@ jobs:
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
 
+      - name: Pin ed25519-dalek for Soroban test compatibility
+        run: cargo update -p ed25519-dalek:3.0.0 --precise 2.1.1 || true
+
       - name: Run Soroban Unit Tests
         run: cargo test --verbose
 

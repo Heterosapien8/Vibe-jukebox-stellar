@@ -13,7 +13,6 @@ yarn-error.log*
 # Rust / Soroban
 target/
 **/*.rs.bk
-Cargo.lock
 
 # Environment & IDE
 .env
