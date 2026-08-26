@@ -90,54 +90,43 @@ export const SongQueue: React.FC<SongQueueProps> = ({
       {isLoading || songs.length === 0 ? (
         <SongQueueSkeleton count={5} />
       ) : (
-        /* Song Cards List */
+        /* Song Cards List (Reference Images 2 & 3) */
         <div className="space-y-2.5">
           {songs.map((song, index) => {
             const rank = index + 1;
             const isTopTrack = rank === 1;
             const isThisPlaying = currentPlayingSong?.id === song.id && isPlaying;
-            const votePercentage = Math.round((song.votes / highestVotes) * 100);
-            const selectorCode = getSelectorCode(index);
+            const votePercentage = Math.max(Math.round((song.votes / highestVotes) * 100), 12);
 
             return (
               <div
                 key={song.id}
-                className={`relative rounded-lg p-3 sm:p-3.5 transition-colors border ${
+                className={`relative rounded-xl sm:rounded-2xl p-3 sm:p-3.5 transition-all border ${
                   isTopTrack
-                    ? 'bg-[#1e0a24] border-neon-pink/70 shadow-[0_0_15px_rgba(255,45,109,0.25)]'
-                    : 'bg-[#120718] border-white/10 hover:border-neon-cyan/40 hover:bg-[#180b20]'
+                    ? 'bg-[#13091b] border-[#ff1e75] shadow-[0_0_15px_rgba(255,30,117,0.25)]'
+                    : 'bg-[#13091b] border-white/10 hover:border-white/20'
                 }`}
               >
-                {/* Top Track Leader Ribbon */}
-                {isTopTrack && (
-                  <div className="absolute -top-2.5 left-4 px-2 py-0.5 rounded bg-[#78350f] text-[#fef3c7] text-[9px] font-mono font-black uppercase tracking-widest flex items-center gap-1 shadow-sm">
-                    <span>LEADER</span>
-                  </div>
-                )}
-
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                  {/* Left: Selector Tag, Cover Art, Metadata */}
-                  <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto">
-                    {/* Selector Slot Code & Rank Badge (Solid Fill) */}
-                    <div className="flex flex-col items-center justify-center flex-shrink-0">
-                      <div
-                        className={`w-9 h-9 rounded flex flex-col items-center justify-center font-mono font-black text-xs ${
-                          rank === 1
-                            ? 'bg-[#3b1236] text-neon-pink'
-                            : rank === 2
-                            ? 'bg-[#0f2329] text-neon-cyan'
-                            : rank === 3
-                            ? 'bg-[#291705] text-neon-amber'
-                            : 'bg-[#170a1e] text-text-secondary'
-                        }`}
-                      >
-                        <span className="text-[8px] font-bold opacity-80">{selectorCode}</span>
-                        <span className="leading-none">{`#${rank}`}</span>
-                      </div>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+                  {/* Left: Rank Badge, Cover Art, Metadata */}
+                  <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto flex-1">
+                    {/* Rank Badge */}
+                    <div
+                      className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center font-black text-sm sm:text-base flex-shrink-0 ${
+                        rank === 1
+                          ? 'bg-[#240b28] text-[#ff1e75]'
+                          : rank === 2
+                          ? 'bg-[#0a2024] text-[#00e5be]'
+                          : rank === 3
+                          ? 'bg-[#291705] text-[#ffb84d]'
+                          : 'bg-[#180a20] text-[#9ca3af]'
+                      }`}
+                    >
+                      <span>{`#${rank}`}</span>
                     </div>
 
-                    {/* Album Cover Art */}
-                    <div className="relative w-12 h-12 rounded overflow-hidden group flex-shrink-0 bg-[#08020a]">
+                    {/* Album Cover Art with Preview Button */}
+                    <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-lg overflow-hidden group flex-shrink-0 bg-[#08020a]">
                       <img
                         src={song.albumArt}
                         alt={song.title}
@@ -162,47 +151,44 @@ export const SongQueue: React.FC<SongQueueProps> = ({
                       <h3 className="text-sm sm:text-base font-bold text-white truncate font-sans">
                         {song.title}
                       </h3>
-                      <p className="text-xs text-text-secondary truncate">
-                        {song.artist} • <span className="text-text-primary/90 font-medium">{song.genre}</span>
+                      <p className="text-xs sm:text-sm text-[#9ca3af] truncate mt-0.5">
+                        {song.artist} • {song.genre}
                       </p>
-                      <div className="mt-0.5 flex items-center gap-2 text-[10px] text-text-secondary font-mono">
-                        <span>{song.totalPlays} plays</span>
-                        <span>•</span>
-                        <span className="text-neon-cyan">{song.duration || '2:50'}</span>
-                      </div>
                     </div>
                   </div>
 
-                  {/* Right: Votes & Push Button Voting Action */}
-                  <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-white/5 pt-2 sm:pt-0">
-                    {/* Digital Readout Vote Counter (Solid Dark Panel) */}
-                    <div className="text-right min-w-[80px] bg-[#07020a] px-2.5 py-1.5 rounded border border-white/10">
-                      <div className="flex items-baseline justify-end gap-1 font-mono">
+                  {/* Right: Votes Box & Push Vote Action */}
+                  <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-white/5 pt-2 sm:pt-0 flex-shrink-0">
+                    {/* Vote Box with Metric & Progress Bar */}
+                    <div className="bg-[#08020a] px-3.5 py-1.5 sm:py-2 rounded-lg min-w-[85px] sm:min-w-[95px] flex flex-col justify-center">
+                      <div className="flex items-baseline justify-center gap-1 font-mono">
                         <span className="text-base sm:text-lg font-black text-white">
                           {song.votes}
                         </span>
-                        <span className="text-[10px] font-bold text-neon-pink">VIBE</span>
+                        <span className="text-[10px] sm:text-xs font-bold text-[#ff1e75] tracking-wider">
+                          VIBE
+                        </span>
                       </div>
-                      {/* Vote progress meter */}
-                      <div className="w-16 h-1 bg-[#1a0a20] rounded mt-0.5 overflow-hidden ml-auto">
+                      {/* Vote progress meter bar */}
+                      <div className="w-full h-1 bg-[#1a0a20] rounded-full mt-1 overflow-hidden">
                         <div
-                          className="h-full bg-neon-pink rounded transition-all duration-300"
-                          style={{ width: `${votePercentage}%` }}
+                          className="h-full bg-[#ff1e75] rounded-full transition-all duration-300"
+                          style={{ width: `${isTopTrack ? 100 : votePercentage}%` }}
                         />
                       </div>
                     </div>
 
-                    {/* Solid Push Button Quick Vote Controls */}
+                    {/* Push Vote Button */}
                     <div className="relative">
                       {votingSongId === song.id ? (
-                        <div className="flex items-center gap-1 p-1 rounded bg-[#09030e] border border-neon-pink shadow-sm">
+                        <div className="flex items-center gap-1 p-1 rounded-lg bg-[#08020a] border border-[#ff1e75] shadow-[0_0_10px_rgba(255,30,117,0.3)]">
                           {[5, 10, 25, 50].map((amt) => (
                             <button
                               key={amt}
                               onClick={() => handleQuickVote(song.id, amt)}
                               disabled={isSubmittingVote}
                               type="button"
-                              className="px-2 py-1 rounded text-xs font-mono font-bold bg-[#ff2d6d] hover:bg-[#e0265f] text-white transition-colors"
+                              className="px-2.5 py-1 rounded text-xs font-mono font-bold bg-[#ff1e75] hover:bg-[#e01865] text-white transition-colors"
                             >
                               +{amt}
                             </button>
@@ -210,7 +196,7 @@ export const SongQueue: React.FC<SongQueueProps> = ({
                           <button
                             onClick={() => setVotingSongId(null)}
                             type="button"
-                            className="p-1 text-text-secondary hover:text-white"
+                            className="p-1 text-[#9ca3af] hover:text-white"
                           >
                             <XMarkIcon className="w-4 h-4" />
                           </button>
@@ -225,10 +211,10 @@ export const SongQueue: React.FC<SongQueueProps> = ({
                             }
                           }}
                           type="button"
-                          className="flex items-center gap-1.5 px-3.5 py-2 rounded bg-[#ff2d6d] hover:bg-[#e0265f] text-white font-mono text-xs font-black uppercase tracking-wider transition-colors shadow-sm active:scale-95"
+                          className="flex items-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg bg-[#ff1e75] hover:bg-[#e01865] text-white font-mono text-xs sm:text-sm font-black uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(255,30,117,0.35)] active:scale-95 flex-shrink-0"
                         >
-                          <FireIcon className="w-4 h-4" />
-                          <span>Push Vote</span>
+                          <FireIcon className="w-4 h-4 text-white fill-white" />
+                          <span>PUSH VOTE</span>
                         </button>
                       )}
                     </div>

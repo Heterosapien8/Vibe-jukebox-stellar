@@ -97,55 +97,46 @@ export const JukeboxFrame: React.FC<JukeboxFrameProps> = ({
                     Decentralized on-chain music lounge powered by Stellar smart contracts
                   </p>
 
-                  {/* Vintage NOW PLAYING Card Plaque (Cream Diner Plaque) */}
+                  {/* Main Song Card (Ivory Card - Reference Image 1) */}
                   <div className="relative z-10 w-full max-w-xl">
-                    <div className="now-playing-plaque p-3 sm:p-4 text-[#1c1008] flex items-center justify-between gap-3 sm:gap-4">
+                    <div className="now-playing-plaque px-4 sm:px-6 py-3.5 sm:py-4 text-[#18110b] flex items-center justify-between gap-3 sm:gap-4">
                       {/* Left: Play/Pause Button & Track Info */}
                       <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                         <button
                           onClick={onTogglePlay}
                           type="button"
-                          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#1c1008] text-[#ffb84d] hover:text-white border-2 border-[#78350f] flex items-center justify-center flex-shrink-0 shadow-md hover:scale-105 active:scale-95 transition-transform"
-                          title={isPlaying ? 'Pause Lounge Audio' : 'Play Live Lounge Audio'}
+                          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#1c120c] text-[#f59e0b] hover:text-[#fbbf24] flex items-center justify-center flex-shrink-0 shadow-md hover:scale-105 active:scale-95 transition-transform"
+                          title={isPlaying ? 'Pause Audio' : 'Play Audio'}
                         >
                           {isPlaying ? (
-                            <PauseIcon className="w-6 h-6 fill-current" />
+                            <PauseIcon className="w-6 h-6 fill-[#f59e0b]" />
                           ) : (
-                            <PlayIcon className="w-6 h-6 fill-current ml-0.5" />
+                            <PlayIcon className="w-6 h-6 fill-[#f59e0b] ml-0.5" />
                           )}
                         </button>
 
                         <div className="min-w-0 text-left">
-                          <div className="flex items-center gap-1.5 mb-0.5">
-                            {/* Solid Burgundy Now Playing Pill */}
-                            <span className="px-2 py-0.5 rounded bg-[#78350f] text-[#fef3c7] text-[9px] sm:text-[10px] font-mono font-black tracking-widest uppercase">
-                              NOW PLAYING
-                            </span>
-                            {activeTrack && (
-                              <span className="text-[10px] sm:text-xs font-mono font-bold text-[#78350f] truncate">
-                                • {activeTrack.genre}
-                              </span>
-                            )}
-                          </div>
-                          <h3 className="text-base sm:text-lg font-black font-sans tracking-tight text-[#1c1008] truncate">
-                            {activeTrack ? activeTrack.title : 'Select track to play'}
+                          <h3 className="text-lg sm:text-2xl font-black font-sans tracking-tight text-[#18110b] truncate">
+                            {activeTrack ? activeTrack.title : 'Quantum Drift'}
                           </h3>
-                          <p className="text-xs font-medium text-[#78350f] truncate">
-                            {activeTrack ? activeTrack.artist : 'Stellar Soroban Lounge'}
+                          <p className="text-xs sm:text-sm font-mono font-bold text-[#8c6036] truncate mt-0.5">
+                            {activeTrack ? `${activeTrack.artist} • ${activeTrack.genre}` : 'Aetherix • Darksynth'}
                           </p>
                         </div>
                       </div>
 
-                      {/* Right: Lead Vote Tally */}
-                      <div className="text-right flex-shrink-0 border-l border-[#d97706]/40 pl-3 sm:pl-4">
-                        <span className="text-[9px] sm:text-[10px] uppercase font-mono font-black tracking-wider text-[#78350f] block">
+                      {/* Right: Lead Vote Tally with Divider */}
+                      <div className="text-right flex-shrink-0 border-l border-[#e4d5bc] pl-4 sm:pl-6 py-0.5">
+                        <span className="text-[9px] sm:text-[10px] uppercase font-mono font-bold tracking-widest text-[#8c6036] block">
                           LEAD VOTES
                         </span>
-                        <div className="flex items-baseline justify-end gap-1 font-mono">
-                          <span className="text-xl sm:text-2xl font-black text-[#1c1008]">
+                        <div className="flex items-baseline justify-end gap-1 font-mono mt-0.5">
+                          <span className="text-xl sm:text-2xl font-black text-[#18110b]">
                             {activeTrack ? activeTrack.votes : 0}
                           </span>
-                          <span className="text-[10px] font-bold text-[#b45309]">VIBE</span>
+                          <span className="text-[10px] sm:text-xs font-bold text-[#8c6036] uppercase tracking-wider">
+                            VIBE
+                          </span>
                         </div>
                       </div>
                     </div>

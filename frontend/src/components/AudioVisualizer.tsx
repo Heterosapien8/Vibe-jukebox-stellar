@@ -11,9 +11,6 @@ import {
   SpeakerXMarkIcon,
   ArrowPathIcon,
   ArrowsRightLeftIcon,
-  PlusCircleIcon,
-  CheckCircleIcon,
-  QueueListIcon,
 } from '@heroicons/react/24/solid';
 
 interface AudioVisualizerProps {
@@ -33,7 +30,6 @@ export const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
   const [duration, setDuration] = useState<number>(180);
   const [isShuffle, setIsShuffle] = useState<boolean>(false);
   const [isRepeat, setIsRepeat] = useState<boolean>(false);
-  const [isSaved, setIsSaved] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -112,20 +108,6 @@ export const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
               {currentSong.artist}
             </p>
           </div>
-
-          {/* Save / Like Track Action */}
-          <button
-            onClick={() => setIsSaved(!isSaved)}
-            type="button"
-            className="hidden sm:block p-1 text-[#b3b3b3] hover:text-white transition-colors flex-shrink-0"
-            title="Save to Liked Songs"
-          >
-            {isSaved ? (
-              <CheckCircleIcon className="w-5 h-5 text-[#1db954]" />
-            ) : (
-              <PlusCircleIcon className="w-5 h-5" />
-            )}
-          </button>
         </div>
 
         {/* 2. CENTER SECTION: Playback Controls & Progress Bar (Spotify Style) */}
@@ -228,17 +210,12 @@ export const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
           </div>
         </div>
 
-        {/* 3. RIGHT SECTION: Volume & Queue Standings (Spotify Style) */}
-        <div className="hidden sm:flex items-center justify-end gap-3 w-1/4 max-w-[300px]">
-          {/* Queue Icon */}
-          <div className="p-1 text-[#b3b3b3] hover:text-white transition-colors cursor-pointer" title="Queue Standings">
-            <QueueListIcon className="w-4 h-4" />
-          </div>
-
-          {/* Lead Votes Pill */}
-          <div className="px-2 py-0.5 rounded bg-[#181818] border border-white/10 text-[10px] font-mono font-bold text-[#b3b3b3] whitespace-nowrap">
-            <span>LEAD: </span>
-            <span className="text-[#ff2d6d] font-black">{currentSong.votes} VIBE</span>
+        {/* 3. RIGHT SECTION: Volume & Solid Lead Votes Tag */}
+        <div className="hidden sm:flex items-center justify-end gap-3.5 w-1/4 max-w-[300px]">
+          {/* Enriched Solid Color Lead Votes Tag */}
+          <div className="px-3.5 py-1.5 rounded-lg bg-[#ff1e75] text-white text-xs sm:text-sm font-mono font-black uppercase tracking-wider whitespace-nowrap shadow-[0_0_12px_rgba(255,30,117,0.4)] flex items-center gap-1.5">
+            <span>LEAD:</span>
+            <span>{currentSong.votes} VIBE</span>
           </div>
 
           {/* Volume Control */}

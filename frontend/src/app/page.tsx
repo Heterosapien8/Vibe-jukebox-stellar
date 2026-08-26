@@ -232,11 +232,11 @@ export default function HomePage() {
       setToastFeedback((prev) =>
         prev
           ? {
-              ...prev,
-              status: 'signing',
-              title: 'Awaiting Wallet Signature...',
-              message: 'Please confirm the tip transaction in your wallet.',
-            }
+            ...prev,
+            status: 'signing',
+            title: 'Awaiting Wallet Signature...',
+            message: 'Please confirm the tip transaction in your wallet.',
+          }
           : null
       );
       const signedXdr = await signTransactionWithWallet(unsignedXdr, walletState.walletType, demoSecretKey || undefined);
@@ -244,11 +244,11 @@ export default function HomePage() {
       setToastFeedback((prev) =>
         prev
           ? {
-              ...prev,
-              status: 'submitting',
-              title: 'Submitting to Horizon Testnet...',
-              message: 'Broadcasting signed XDR to Stellar validators.',
-            }
+            ...prev,
+            status: 'submitting',
+            title: 'Submitting to Horizon Testnet...',
+            message: 'Broadcasting signed XDR to Stellar validators.',
+          }
           : null
       );
       const result = await submitTransactionXDR(signedXdr);
@@ -476,7 +476,7 @@ export default function HomePage() {
       {/* 2. Main Centerstage Container with Flanking Signs (Canva Mockup Layout - Zoomed & Full Stage) */}
       <main className="flex-1 w-full max-w-[1700px] mx-auto px-2 sm:px-4 lg:px-8 pt-2 sm:pt-4">
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-3 sm:gap-6 lg:gap-8 items-center justify-between">
-          
+
           {/* LEFT COLUMN: Top Marquee Sign ("CLICK TO TIP XLM") & Bottom Neon Sign ("CLAIM 100 VIBE") */}
           <div className="xl:col-span-3 flex flex-row xl:flex-col items-center justify-center xl:justify-around gap-4 sm:gap-8 order-2 xl:order-1 h-full py-4">
             {/* Top-Left: Vintage Vegas/Diner Marquee Sign */}
