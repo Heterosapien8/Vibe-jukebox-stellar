@@ -55,8 +55,8 @@ Users connect their Stellar wallet, claim free daily **VIBE testnet tokens** dir
 - **Mobile Responsive Frontend**: Fully responsive glassmorphism UI optimized for mobile, tablet, and desktop screens.
 - **Contract & Frontend Testing**: 5 unit tests for Soroban contracts + 11 Vitest tests for frontend helpers and components.
 - **Demo Video**: [Watch the 2-Minute Walkthrough Video](YOUR_LOOM_OR_YOUTUBE_LINK_HERE)
-- **Live Demo**: [https://vibe-jukebox-stellar.vercel.app](YOUR_VERCEL_OR_NETLIFY_LINK_HERE)
-- 
+- **Live Demo**: [https://vibe-stellar-git-main-heterosapien8s-projects.vercel.app/](https://vibe-stellar-git-main-heterosapien8s-projects.vercel.app/)
+
 #### Screenshots
 
 **Mobile Responsive UI**  
@@ -126,7 +126,15 @@ aug_stellar/
 
 ## Quick Start Guide
 
-### Prerequisites
+### 🌐 Live Deployment
+The application is live and accessible online at:  
+👉 **[https://vibe-stellar-git-main-heterosapien8s-projects.vercel.app/](https://vibe-stellar-git-main-heterosapien8s-projects.vercel.app/)**
+
+---
+
+### Local Development Setup
+
+#### Prerequisites
 - [Node.js](https://nodejs.org) (v18+ or v20+)
 - [Rust & Cargo](https://rustup.rs) (with `wasm32-unknown-unknown` / `wasm32v1-none` target)
 - [Stellar / Soroban CLI](https://developers.stellar.org/docs/tools/developer-tools/cli/stellar-cli) (`stellar` / `soroban`)
