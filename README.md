@@ -42,6 +42,7 @@ Users connect their Stellar wallet, claim free daily **VIBE testnet tokens** dir
 - **Transaction Status Visible**: Step-by-step transaction indicator (preparing, signing, submitting, confirmed) with live Stellar Expert explorer links.
 - **Multi-Wallet App**: Native support for Freighter, Albedo, xBull, LOBSTR, and an instant browser-funded Testnet sandbox.
 #### Screenshots
+
 **Wallet Options Available**  
 ![Wallet Options Available](./docs/ss_wallets.png)
 ---
@@ -55,11 +56,15 @@ Users connect their Stellar wallet, claim free daily **VIBE testnet tokens** dir
 - **Contract & Frontend Testing**: 5 unit tests for Soroban contracts + 11 Vitest tests for frontend helpers and components.
 - **Demo Video**: [Watch the 2-Minute Walkthrough Video](YOUR_LOOM_OR_YOUTUBE_LINK_HERE)
 - **Live Demo**: [https://vibe-jukebox-stellar.vercel.app](YOUR_VERCEL_OR_NETLIFY_LINK_HERE)
+- 
 #### Screenshots
+
 **Mobile Responsive UI**  
 ![Mobile Responsive UI](./docs/ss_mobile.png)
+
 **CI/CD Pipeline Passing**  
 ![CI/CD Pipeline Running](./docs/ss_cicd.png)
+
 **Test Suite (16 Passing Tests: 5 Soroban + 11 Frontend)**  
 ![Passing Test Suite](./docs/ss_tests.png)
 
