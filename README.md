@@ -1,4 +1,4 @@
-# 🎵 VIBE Jukebox — Token-Curated Jukebox on Stellar & Soroban
+# VIBE Jukebox — Token-Curated Jukebox on Stellar & Soroban
 
 [![CI/CD Pipeline](https://github.com/Heterosapien8/aug_stellar/actions/workflows/ci.yml/badge.svg)](https://github.com/Heterosapien8/aug_stellar/actions/workflows/ci.yml)
 [![Stellar Network](https://img.shields.io/badge/Stellar-Testnet-00f0ff.svg?logo=stellar)](https://stellar.org)
@@ -6,11 +6,11 @@
 [![Next.js 14](https://img.shields.io/badge/Next.js-14_App_Router-black.svg?logo=next.js)](https://nextjs.org)
 
 **Rise In — Stellar Bootcamp Bounty Submission**  
-Built by **Heterosapien8** (`kumardivyanshu8888@gmail.com`)
+Built by **Divyanshu Kumar** 
 
 ---
 
-## 🌟 Overview
+## Overview
 
 **VIBE Jukebox** is a decentralized, token-curated music lounge application deployed on the **Stellar Testnet** and powered by **Soroban smart contracts**.
 
@@ -18,9 +18,9 @@ Users connect their Stellar wallet, claim free daily **VIBE testnet tokens** dir
 
 ---
 
-## 🥋 Belt Milestones Satisfied
+## Belt Milestones Satisfied
 
-### 🥋 Level 1 (White Belt)
+### Level 1 (White Belt)
 ### Screenshots
 
 **Wallet connected**
@@ -35,15 +35,38 @@ Users connect their Stellar wallet, claim free daily **VIBE testnet tokens** dir
 **Transaction result shown**
 ![Transaction result](./docs/ss4.png)
 
-### 🥋 Level 2 (Yellow Belt)
+### Level 2 (Yellow Belt)
+- **3 Error Types Handled**: Insufficient VIBE balance, rate-limited 24h daily claims, unauthorized song registrations, unfunded testnet account (404), and wallet signature rejection.
+- **Contract Deployed on Testnet**: VIBE Token (`CD76SQMY...`) & Jukebox Voting (`CAVVNHZ3...`).
+- **Contract Called from Frontend**: Direct invocations for daily claim minting, variable token burning, and on-chain track creation.
+- **Transaction Status Visible**: Step-by-step transaction indicator (preparing, signing, submitting, confirmed) with live Stellar Expert explorer links.
+- **Multi-Wallet App**: Native support for Freighter, Albedo, xBull, LOBSTR, and an instant browser-funded Testnet sandbox.
+#### Screenshots
+**Wallet Options Available**  
+![Wallet Options Available](./docs/ss_wallets.png)
+---
 
 
-### 🥋 Level 3 (Orange Belt)
+### Level 3 (Orange Belt)
+- **Inter-Contract Communication**: `jukebox-voting` contract initiates cross-contract calls into `vibe-token` via `VibeTokenClient` to burn tokens during song upvoting.
+- **Event Streaming & Real-Time Updates**: Soroban contract events (`votecast`, `song_add`, `claim`, `burn`, `reset`) emitted and polled by the frontend queue.
+- **CI/CD Pipeline**: Automated GitHub Actions workflow testing Soroban Rust WASM contracts and Next.js builds on every push/PR.
+- **Mobile Responsive Frontend**: Fully responsive glassmorphism UI optimized for mobile, tablet, and desktop screens.
+- **Contract & Frontend Testing**: 5 unit tests for Soroban contracts + 11 Vitest tests for frontend helpers and components.
+- **Demo Video**: [Watch the 2-Minute Walkthrough Video](YOUR_LOOM_OR_YOUTUBE_LINK_HERE)
+- **Live Demo**: [https://vibe-jukebox-stellar.vercel.app](YOUR_VERCEL_OR_NETLIFY_LINK_HERE)
+#### Screenshots
+**Mobile Responsive UI**  
+![Mobile Responsive UI](./docs/ss_mobile.png)
+**CI/CD Pipeline Passing**  
+![CI/CD Pipeline Running](./docs/ss_cicd.png)
+**Test Suite (16 Passing Tests: 5 Soroban + 11 Frontend)**  
+![Passing Test Suite](./docs/ss_tests.png)
 
 
 ---
 
-## 📦 Verified Stellar Testnet Deployments & Invocations
+## Verified Stellar Testnet Deployments & Invocations
 
 | Parameter | Value / Link |
 |---|---|
@@ -60,7 +83,7 @@ Users connect their Stellar wallet, claim free daily **VIBE testnet tokens** dir
 
 ---
 
-## 🏛️ Project Architecture
+## Project Architecture
 
 ```
 aug_stellar/
@@ -96,7 +119,7 @@ aug_stellar/
 
 ---
 
-## 🚀 Quick Start Guide
+## Quick Start Guide
 
 ### Prerequisites
 - [Node.js](https://nodejs.org) (v18+ or v20+)
@@ -144,7 +167,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 🧪 Testing Verification
+## Testing Verification
 
 ### Smart Contracts (Rust)
 ```
@@ -172,5 +195,5 @@ Tests       11 passed (11)
 
 ---
 
-## 📜 License
+## License
 MIT License. Built for the Rise In Stellar Bootcamp Bounty.
