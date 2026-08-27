@@ -54,7 +54,7 @@ Users connect their Stellar wallet, claim free daily **VIBE testnet tokens** dir
 - **CI/CD Pipeline**: Automated GitHub Actions workflow testing Soroban Rust WASM contracts and Next.js builds on every push/PR.
 - **Mobile Responsive Frontend**: Fully responsive glassmorphism UI optimized for mobile, tablet, and desktop screens.
 - **Contract & Frontend Testing**: 5 unit tests for Soroban contracts + 11 Vitest tests for frontend helpers and components.
-- **Demo Video**: [Watch the 2-Minute Walkthrough Video](YOUR_LOOM_OR_YOUTUBE_LINK_HERE)
+- **Demo Video**: [Watch the 2-Minute Walkthrough Video](https://youtu.be/UMpXYfNvXgM)
 - **Live Demo**: [https://vibe-stellar-git-main-heterosapien8s-projects.vercel.app/](https://vibe-stellar-git-main-heterosapien8s-projects.vercel.app/)
 
 #### Screenshots
