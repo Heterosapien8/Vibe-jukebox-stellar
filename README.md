@@ -126,9 +126,9 @@ aug_stellar/
 
 ## Quick Start Guide
 
-### 🌐 Live Deployment
+### Live Deployment
 The application is live and accessible online at:  
-👉 **[https://vibe-stellar-git-main-heterosapien8s-projects.vercel.app/](https://vibe-stellar-git-main-heterosapien8s-projects.vercel.app/)**
+**[https://vibe-stellar-git-main-heterosapien8s-projects.vercel.app/](https://vibe-stellar-git-main-heterosapien8s-projects.vercel.app/)**
 
 ---
 
